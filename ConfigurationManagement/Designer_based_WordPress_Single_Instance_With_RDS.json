@@ -1,0 +1,223 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+   "Description": "designer base version of Template WordPress_Single_Instance_With_RDS",
+  "Metadata": {
+    "AWS::CloudFormation::Designer": {
+      "d165af1f-88de-45c9-9d87-2bca5ea204e3": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 40,
+          "y": 100
+        },
+        "z": 0,
+        "embeds": [],
+        "ismemberof": [
+          "eb41c3df-a43e-4271-9e1f-5bf02801eb22"
+        ]
+      },
+      "5abf2b82-dafa-47d3-af08-aac7e7bc949d": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -260,
+          "y": 90
+        },
+        "z": 0,
+        "embeds": [],
+        "ismemberof": [
+          "49446f8e-fa4a-432c-bab1-44b99bd47756"
+        ]
+      },
+      "49446f8e-fa4a-432c-bab1-44b99bd47756": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -127.21002197265625,
+          "y": 88.38999938964844
+        },
+        "z": 0,
+        "embeds": [],
+        "isrelatedto": [
+          "eb41c3df-a43e-4271-9e1f-5bf02801eb22"
+        ]
+      },
+      "eb41c3df-a43e-4271-9e1f-5bf02801eb22": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": -260,
+          "y": 190
+        },
+        "z": 0,
+        "embeds": []
+      },
+      "5ebbb6b7-dc21-4db3-b2fe-23baa6eda49a": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 270,
+          "y": 80
+        },
+        "z": 0,
+        "embeds": [],
+        "references": [
+          "020eb563-807f-4a7c-81c3-40994512df60"
+        ],
+        "dependson": [
+          "d165af1f-88de-45c9-9d87-2bca5ea204e3"
+        ]
+      },
+      "020eb563-807f-4a7c-81c3-40994512df60": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 270,
+          "y": 220
+        },
+        "z": 0,
+        "embeds": []
+      },
+      "a53d0ef7-7385-4de6-8bce-d71cdab3198f": {
+        "source": {
+          "id": "5abf2b82-dafa-47d3-af08-aac7e7bc949d"
+        },
+        "target": {
+          "id": "49446f8e-fa4a-432c-bab1-44b99bd47756"
+        },
+        "z": 1
+      },
+      "9968abd0-08d3-4dd9-9bba-7202b9d01a52": {
+        "source": {
+          "id": "d165af1f-88de-45c9-9d87-2bca5ea204e3"
+        },
+        "target": {
+          "id": "eb41c3df-a43e-4271-9e1f-5bf02801eb22"
+        },
+        "z": 2
+      },
+      "841fca6c-f2b4-41e1-a471-766a9417e451": {
+        "source": {
+          "id": "5ebbb6b7-dc21-4db3-b2fe-23baa6eda49a"
+        },
+        "target": {
+          "id": "020eb563-807f-4a7c-81c3-40994512df60"
+        },
+        "z": 3
+      },
+      "61a7184d-4b43-4e71-92e3-6b641d58ef10": {
+        "source": {
+          "id": "5ebbb6b7-dc21-4db3-b2fe-23baa6eda49a"
+        },
+        "target": {
+          "id": "d165af1f-88de-45c9-9d87-2bca5ea204e3"
+        },
+        "z": 11
+      },
+      "ae46e3d1-6f8b-4cd5-96a4-9b6cb6a71c0c": {
+        "source": {
+          "id": "020eb563-807f-4a7c-81c3-40994512df60"
+        },
+        "target": {
+          "id": "d165af1f-88de-45c9-9d87-2bca5ea204e3"
+        },
+        "z": 12
+      }
+    }
+  },
+  "Resources": {
+    "WebServer": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "SecurityGroupIds": [
+          {
+            "Ref": "WebServerSecurityGroup"
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "d165af1f-88de-45c9-9d87-2bca5ea204e3"
+        }
+      }
+    },
+    "DBInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "Properties": {
+        "DBSecurityGroups": [
+          {
+            "Ref": "DBSecurityGroup"
+          }
+        ]
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "5abf2b82-dafa-47d3-af08-aac7e7bc949d"
+        }
+      }
+    },
+    "DBSecurityGroup": {
+      "Type": "AWS::RDS::DBSecurityGroup",
+      "Properties": {
+        "DBSecurityGroupIngress": {
+          "EC2SecurityGroupName": {
+            "Ref": "WebServerSecurityGroup"
+          }
+        },
+        "GroupDescription": "Frontend Access"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "49446f8e-fa4a-432c-bab1-44b99bd47756"
+        }
+      }
+    },
+    "WebServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {},
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "eb41c3df-a43e-4271-9e1f-5bf02801eb22"
+        }
+      }
+    },
+    "WaitConditionHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle",
+      "Properties": {},
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "020eb563-807f-4a7c-81c3-40994512df60"
+        }
+      }
+    },
+    "WaitCondition": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "Properties": {
+        "Handle": {
+          "Ref": "WaitConditionHandle"
+        },
+        "Timeout": "600"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "5ebbb6b7-dc21-4db3-b2fe-23baa6eda49a"
+        }
+      },
+      "DependsOn": [
+        "WebServer"
+      ]
+    }
+  }
+}
