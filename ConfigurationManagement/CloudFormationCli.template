@@ -43,6 +43,17 @@
   "Resources" : {
     "CloudFormationCli" : {
       "Type" : "AWS::EC2::Instance",
+      "Metadata" : {
+        "AWS::CloudFormation::Init" : {
+          "config" : {
+            "packages" : {
+              "apt" : {
+                "git" : []
+               }
+            }
+          }  
+        }
+      },          
       "Properties" : {
         "InstanceType" : { "Ref" : "InstanceType" },
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
