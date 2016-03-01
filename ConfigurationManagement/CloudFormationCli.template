@@ -51,7 +51,10 @@
                 "git" : []
                }
             }
-          }  
+          },
+          "sources" : {
+  			"DevOpsInfrastructure" : "https://github.com/mike-lam2/DevOpsInfrastructure.git/tarball/master"
+  		  }  
         }
       },          
       "Properties" : {
