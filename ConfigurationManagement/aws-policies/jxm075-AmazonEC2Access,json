@@ -1,0 +1,49 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "ec2:*",
+            "Effect": "Allow",
+            "Resource": "arn:aws:ec2:us-east-1::*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "cloudwatch:*",
+            "Resource": "arn:aws:ec2:us-east-1::*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "elasticloadbalancing:*",
+            "Resource": "arn:aws:ec2:us-east-1::*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "autoscaling:*",
+            "Resource": "arn:aws:ec2:us-east-1::*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ec2:*",
+            "Resource": [
+                "arn:aws:ec2:us-east-1::*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "ec2:InstanceType": "t2.micro"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "ec2:*",
+            "Resource": [
+                "arn:aws:ec2:sa-east-1::image/ami-*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "ec2:Owner": "amazon"
+                }
+            }
+        }
+    ]
+}
