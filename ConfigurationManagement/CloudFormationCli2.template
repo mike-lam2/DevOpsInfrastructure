@@ -44,7 +44,7 @@
     }
   },
   "Resources": {
-    "CloudFormationCli2": {
+     {"Ref": "AWS::StackName"}: {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
         "AWS::CloudFormation::Init": {
@@ -96,7 +96,7 @@
           "#!/bin/bash\n",
           "yum update -y aws-cfn-bootstrap\n",
 
-          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r CloudFormationCli2 ",
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ",{ "Ref" : "AWS::StackName" },
           "         --region ", { "Ref" : "AWS::Region" }, "\n",
 
           "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n"
@@ -131,7 +131,7 @@
 
     "WaitCondition" : {
       "Type" : "AWS::CloudFormation::WaitCondition",
-      "DependsOn" : "CloudFormationCli2",
+      "DependsOn" : { "Ref" : "AWS::StackName" },
       "Properties" : {
         "Handle" : {"Ref" : "WaitHandle"},
         "Timeout" : "600"
@@ -142,14 +142,14 @@
     "InstanceId": {
       "Description": "InstanceId of the newly created EC2 instance",
       "Value": {
-        "Ref": "CloudFormationCli2"
+        "Ref" : "AWS::StackName" 
       }
     },
     "AZ": {
       "Description": "Availability Zone of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "CloudFormationCli2",
+          { "Ref" : "AWS::StackName" },
           "AvailabilityZone"
         ]
       }
@@ -158,7 +158,7 @@
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "CloudFormationCli2",
+          { "Ref" : "AWS::StackName" },
           "PublicDnsName"
         ]
       }
@@ -167,9 +167,15 @@
       "Description": "Public IP address of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "CloudFormationCli2",
+          { "Ref" : "AWS::StackName" },
           "PublicIp"
         ]
+      }
+    },
+    "StackName": {
+      "Description": "the name of the stack as specified with the aws cloudformation create-stack command",
+      "Value": {
+        "Ref" : "AWS::StackName"
       }
     }
   },

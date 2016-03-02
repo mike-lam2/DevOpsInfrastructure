@@ -1,7 +1,7 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
 
-  "Description" : "DevOpsApplicationWebServer with httpd + the default image includes AWS command line tools, Python, Ruby, Perl, and Java. The repositories include Docker, PHP, MySQL, PostgreSQL, and other packages.",
+  "Description" : "DevOpsApplicationWebServer with httpd",
 
   "Parameters" : {
     "KeyName": {
@@ -47,14 +47,31 @@
         "AWS::CloudFormation::Init" : {
           "config" : {
             "packages" : {
-              "apt" : {
-                "git" : []
+              "yum" : {
+                "git" : [],
+               	"httpd": []
                }
             }
           },
           "sources" : {
-  			"DevOpsInfrastructure" : "https://github.com/mike-lam2/DevOpsInfrastructure.git/tarball/master"
-  		  }  
+  			"/var/www/html" : "https://github.com/mike-lam2/DevOpsApplication.git/tarball/master"
+  		  },  
+  		  "services": {
+            "sysvinit": {
+              "httpd": {
+                "enabled": "true",
+                "ensureRunning": "true"
+              },
+              "cfn-hup": {
+                "enabled": "true",
+                "ensureRunning": "true",
+                "files": [
+                  "/etc/cfn/cfn-hup.conf",
+                  "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                ]
+              }
+            }
+          }  		  
         }
       },          
       "Properties" : {
@@ -62,7 +79,41 @@
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "KeyName" : { "Ref" : "KeyName" },
         "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] }
+                          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "# Install the files and packages from the metadata\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "# Signal the status from cfn-init\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource DevOpsApplicationWebServer ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }                          
       }
     },
 
@@ -83,19 +134,19 @@
   "Outputs" : {
     "InstanceId" : {
       "Description" : "InstanceId of the newly created EC2 instance",
-      "Value" : { "Ref" : "CloudFormationCli" }
+      "Value" : { "Ref" : "DevOpsApplicationWebServer" }
     },
     "AZ" : {
       "Description" : "Availability Zone of the newly created EC2 instance",
-      "Value" : { "Fn::GetAtt" : [ "CloudFormationCli", "AvailabilityZone" ] }
+      "Value" : { "Fn::GetAtt" : [ "DevOpsApplicationWebServer", "AvailabilityZone" ] }
     },
     "PublicDNS" : {
       "Description" : "Public DNSName of the newly created EC2 instance",
-      "Value" : { "Fn::GetAtt" : [ "CloudFormationCli", "PublicDnsName" ] }
+      "Value" : { "Fn::GetAtt" : [ "DevOpsApplicationWebServer", "PublicDnsName" ] }
     },
     "PublicIP" : {
       "Description" : "Public IP address of the newly created EC2 instance",
-      "Value" : { "Fn::GetAtt" : [ "CloudFormationCli", "PublicIp" ] }
+      "Value" : { "Fn::GetAtt" : [ "DevOpsApplicationWebServer", "PublicIp" ] }
     }
   }
 }
