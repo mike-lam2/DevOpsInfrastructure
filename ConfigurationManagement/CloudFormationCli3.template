@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CloudFormationCli.template: The Amazon Linux AMI is an EBS-backed, AWS-supported image. The default image includes AWS command line tools, Python, Ruby, Perl, and Java. The repositories include Docker, PHP, MySQL, PostgreSQL, and other packages.",
+  "Description": "CloudFormationCli.template3: The Amazon Linux AMI is an EBS-backed, AWS-supported image. The default image includes AWS command line tools, Python, Ruby, Perl, and Java. The repositories include Docker, PHP, MySQL, PostgreSQL, and other packages.",
   "Parameters": {
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -44,7 +44,7 @@
     }
   },
   "Resources": {
-    "Server": {
+    "Server2": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
         "AWS::CloudFormation::Init": {
@@ -53,23 +53,22 @@
               "yum": {
                 "git": []
               }
+            }
+          },            "sources" : {
+              "/var/www/html" : "http://wordpress.org/latest.tar.gz"
             },
-            "sources": {
-              "/home/ec2-user": "https://github.com/mike-lam2/DevOpsInfrastructure.git/tarball/master"
-            },
-            "commands" : {
-    		  "test" : {
-        		"command" : "echo \"$MAGIC\" > test.txt",
-        		"env" : { "MAGIC" : "I come from the environment!" },
-        		"cwd" : "~",
-        		"test" : "test ! -e ~/test.txt",
-        		"ignoreErrors" : "false"
-    		  }
-		    }
-          }
-        },
-        "AWS::CloudFormation::Designer": {
-          "id": "c525bb86-0cb3-4d14-9c8e-14dc065da618"
+            "files" : {
+              "/var/www/html/wordpress/wp-config.php" : {
+                "content" : { "Fn::Join" : ["", [
+                  "<?php\n",
+                  "define('DB_CHARSET',       'utf8');\n",
+                  "define('DB_COLLATE',       '');\n"
+                ]] },
+                "mode" : "000644",
+                "owner" : "root",
+                "group" : "root"
+              }
+            }  
         }
       },
       "Properties": {
@@ -105,10 +104,10 @@
           "#!/bin/bash\n",
           "yum update -y aws-cfn-bootstrap\n",
 
-          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r Server ",
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r Server2 ",
           "         --region ", { "Ref" : "AWS::Region" }, "\n",
-
-          "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n"
+          "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n",
+          "echo var >> /var/test.txt\n"
 
         ]]}}
       }
@@ -127,11 +126,6 @@
             }
           }
         ]
-      },
-      "Metadata": {
-        "AWS::CloudFormation::Designer": {
-          "id": "9cec91dc-7ab8-40f8-8e6b-d0181c4bbc77"
-        }
       }
     },
         "WaitHandle" : {
@@ -140,7 +134,7 @@
 
     "WaitCondition" : {
       "Type" : "AWS::CloudFormation::WaitCondition",
-      "DependsOn" : "Server",
+      "DependsOn" : "Server2",
       "Properties" : {
         "Handle" : {"Ref" : "WaitHandle"},
         "Timeout" : "600"
@@ -151,14 +145,14 @@
     "InstanceId": {
       "Description": "InstanceId of the newly created EC2 instance",
       "Value": {
-        "Ref": "Server"
+        "Ref": "Server2"
       }
     },
     "AZ": {
       "Description": "Availability Zone of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "AvailabilityZone"
         ]
       }
@@ -167,7 +161,7 @@
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "PublicDnsName"
         ]
       }
@@ -176,39 +170,8 @@
       "Description": "Public IP address of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "PublicIp"
-        ]
-      }
-    }
-  },
-  "Metadata": {
-    "AWS::CloudFormation::Designer": {
-      "9cec91dc-7ab8-40f8-8e6b-d0181c4bbc77": {
-        "size": {
-          "width": 60,
-          "height": 60
-        },
-        "position": {
-          "x": 60,
-          "y": 90
-        },
-        "z": 1,
-        "embeds": []
-      },
-      "c525bb86-0cb3-4d14-9c8e-14dc065da618": {
-        "size": {
-          "width": 60,
-          "height": 60
-        },
-        "position": {
-          "x": 180,
-          "y": 90
-        },
-        "z": 1,
-        "embeds": [],
-        "ismemberof": [
-          "9cec91dc-7ab8-40f8-8e6b-d0181c4bbc77"
         ]
       }
     }

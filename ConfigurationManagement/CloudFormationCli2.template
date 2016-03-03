@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "The Amazon Linux AMI is an EBS-backed, AWS-supported image. The default image includes AWS command line tools, Python, Ruby, Perl, and Java. The repositories include Docker, PHP, MySQL, PostgreSQL, and other packages.",
+  "Description": "CloudFormationCli.template2: The Amazon Linux AMI is an EBS-backed, AWS-supported image. The default image includes AWS command line tools, Python, Ruby, Perl, and Java. The repositories include Docker, PHP, MySQL, PostgreSQL, and other packages.",
   "Parameters": {
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -44,7 +44,7 @@
     }
   },
   "Resources": {
-     {"Ref": "AWS::StackName"}: {
+    "Server2": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
         "AWS::CloudFormation::Init": {
@@ -53,11 +53,18 @@
               "yum": {
                 "git": []
               }
-            }
-          },
-          "sources": {
-            "DevOpsInfrastructure": "https://github.com/mike-lam2/DevOpsInfrastructure.git/tarball/master"
-          }
+            },
+            "files" : {
+              "/var/test.txt" : {
+                "content" : { "Fn::Join" : ["", [
+                  "files\n"
+                ]] },
+                "mode" : "000644",
+                "owner" : "root",
+                "group" : "root"
+              }
+            }  
+          }  
         },
         "AWS::CloudFormation::Designer": {
           "id": "c525bb86-0cb3-4d14-9c8e-14dc065da618"
@@ -96,10 +103,10 @@
           "#!/bin/bash\n",
           "yum update -y aws-cfn-bootstrap\n",
 
-          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r ",{ "Ref" : "AWS::StackName" },
+          "/opt/aws/bin/cfn-init -s ", { "Ref" : "AWS::StackId" }, " -r Server2 ",
           "         --region ", { "Ref" : "AWS::Region" }, "\n",
-
-          "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n"
+          "/opt/aws/bin/cfn-signal -e $? '", { "Ref" : "WaitHandle" }, "'\n",
+          "echo var >> /var/test.txt\n"
 
         ]]}}
       }
@@ -131,7 +138,7 @@
 
     "WaitCondition" : {
       "Type" : "AWS::CloudFormation::WaitCondition",
-      "DependsOn" : { "Ref" : "AWS::StackName" },
+      "DependsOn" : "Server2",
       "Properties" : {
         "Handle" : {"Ref" : "WaitHandle"},
         "Timeout" : "600"
@@ -142,14 +149,14 @@
     "InstanceId": {
       "Description": "InstanceId of the newly created EC2 instance",
       "Value": {
-        "Ref" : "AWS::StackName" 
+        "Ref": "Server2"
       }
     },
     "AZ": {
       "Description": "Availability Zone of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          { "Ref" : "AWS::StackName" },
+          "Server2",
           "AvailabilityZone"
         ]
       }
@@ -158,7 +165,7 @@
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          { "Ref" : "AWS::StackName" },
+          "Server2",
           "PublicDnsName"
         ]
       }
@@ -167,15 +174,9 @@
       "Description": "Public IP address of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          { "Ref" : "AWS::StackName" },
+          "Server2",
           "PublicIp"
         ]
-      }
-    },
-    "StackName": {
-      "Description": "the name of the stack as specified with the aws cloudformation create-stack command",
-      "Value": {
-        "Ref" : "AWS::StackName"
       }
     }
   },
