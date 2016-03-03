@@ -41,48 +41,9 @@
         "PV64": "ami-d4f7ddbe",
         "HVM64": "ami-8fcee4e5"
       }
-    },
-    "Region2Principal" : {
-      "us-east-1"      : { "EC2Principal" : "ec2.amazonaws.com", "OpsWorksPrincipal" : "opsworks.amazonaws.com" }
-    },
-    "Region2ARNPrefix": {
-      "us-east-1"      : { "ARNPrefix": "arn:aws:" }
-    }     
+    }
   },
-  "Resources" : {
-    "LogRole": {
-      "Type": "AWS::IAM::Role",
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [ {
-            "Effect": "Allow",
-            "Principal": { "Service": [{ "Fn::FindInMap" : ["Region2Principal", {"Ref" : "AWS::Region"}, "EC2Principal"]}] },
-            "Action": [ "sts:AssumeRole" ]
-        } ] },
-        "Path": "/",
-        "Policies": [ {
-          "PolicyName": "LogRolePolicy",
-          "PolicyDocument": {
-            "Version": "2012-10-17",
-            "Statement": [ {
-              "Effect": "Allow",
-              "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"],
-              "Resource": [ { "Fn::Join" : ["", [ { "Fn::FindInMap" : ["Region2ARNPrefix", {"Ref" : "AWS::Region"}, "ARNPrefix"] }, 
-                            "logs:*:*:*" ]]}]
-          } ] }
-        } ]
-      }
-    },
 
-    "LogRoleInstanceProfile": {
-      "Type": "AWS::IAM::InstanceProfile",
-      "Properties": {
-        "Path": "/",
-        "Roles": [ { "Ref": "LogRole" } ]
-      }
-    },
-    
     "WebServerInstance" : {
       "Type" : "AWS::EC2::Instance",
       "Metadata" : {
