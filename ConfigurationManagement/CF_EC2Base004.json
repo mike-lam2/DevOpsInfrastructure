@@ -45,7 +45,7 @@
     }
   },
   "Resources": {
-    "Server": {
+    "Server2": {
       "Type": "AWS::EC2::Instance",
       "Metadata": {
         "AWS::CloudFormation::Init": {
@@ -95,13 +95,13 @@
                     [
                       "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
-                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
+                      "path=Resources.Server2.Metadata.AWS::CloudFormation::Init\n",
                       "action=/opt/aws/bin/cfn-init -v ",
                       "         --stack ",
                       {
                         "Ref": "AWS::StackName"
                       },
-                      "         --resource Server ",
+                      "         --resource Server2 ",
                       "         --configsets install_all ",
                       "         --region ",
                       {
@@ -174,7 +174,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource Server ",
+                "         --resource Server2 ",
                 "         --configsets install_all ",
                 "         --region ",
                 {
@@ -186,7 +186,7 @@
                 {
                   "Ref": "AWS::StackName"
                 },
-                "         --resource Server ",
+                "         --resource Server2 ",
                 "         --region ",
                 {
                   "Ref": "AWS::Region"
@@ -225,14 +225,14 @@
     "InstanceId": {
       "Description": "InstanceId of the newly created EC2 instance",
       "Value": {
-        "Ref": "Server"
+        "Ref": "Server2"
       }
     },
     "AZ": {
       "Description": "Availability Zone of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "AvailabilityZone"
         ]
       }
@@ -241,7 +241,7 @@
       "Description": "Public DNSName of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "PublicDnsName"
         ]
       }
@@ -250,7 +250,7 @@
       "Description": "Public IP address of the newly created EC2 instance",
       "Value": {
         "Fn::GetAtt": [
-          "Server",
+          "Server2",
           "PublicIp"
         ]
       }

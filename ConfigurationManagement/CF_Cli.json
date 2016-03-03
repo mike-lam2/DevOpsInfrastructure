@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CF_EC2Base.json",
+  "Description": "CF_Cli.json based on CF_EC2Base.json",
   "Parameters": {
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -127,7 +127,31 @@
               }
             }
           },
-          "install_app": {}
+          "install_app": {
+            "sources": {
+              "~/": "https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
+            "commands" : {
+              "bash_profile1" : {
+                "command": "echo found DevOpsInfrastructure/.bash_profile >> result.txt",
+                "env": {"MAGIC": "I come from the environment!"},
+                "cwd": "~",
+                "test": "test ! -e DevOpsInfrastructure/.bash_profile",
+                "ignoreErrors": "false"
+              },
+              "bash_profile2" : {
+                "command": "echo found DevOpsInfrastructure/.bash_profile >> result.txt",
+                "env": {"MAGIC": "I come from the environment!"},
+                "cwd": "~",
+                "test": "test  -e DevOpsInfrastructure/.bash_profile",
+                "ignoreErrors": "false"
+              },
+              "bash_profile_seq" : {
+                "command": ["test -e DevOpsInfrastructure/.bash_profile","OUT=$?","echo test -e DevOpsInfrastructure/.bash_profile RC=$OUT >> result.txt"],
+                "cwd": "~"
+              }              
+            }
+          }
         }
       },
       "Properties": {
