@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion":"2010-09-09",
-  "Description":"CF_WebServer extends CF_EC2Base.json",
+  "Description":"CF_Cli.json extends on CF_EC2Base.json",
   "Parameters":{
     "KeyName":{
       "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -53,7 +53,8 @@
             "install_all":[
               "install_git",
               "install_cfn",
-              "install_app"
+              "install_app",
+              "install_httpd"
             ]
           },
           "install_git":{
@@ -129,16 +130,13 @@
               }
             }
           },
-          "install_app":{
+          "install_httpd":{
             "packages":{
               "yum":{
                 "httpd":[
                   
                 ]
               }
-            },
-            "sources":{
-              "/var/www/html/DevOpsApplication":"https://github.com/mike-lam2/DevOpsApplication/tarball/master"
             },
             "services":{
               "sysvinit":{
@@ -148,7 +146,32 @@
                 }
               }
             }
+          },
+          "install_app":{
+            "sources":{
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
+            "commands":{
+              "000-start":{
+                "command":"sudo echo \"start\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              },
+              "001-bash_profile":{
+                "command":"sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              },
+              "999-end":{
+                "command":"sudo echo \"end\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              }
+            }
           }
+        },
+        "AWS::CloudFormation::Designer":{
+          "id":"b1702331-0733-4540-bb56-dc2998f136ec"
         }
       },
       "Properties":{
@@ -217,7 +240,8 @@
                 {
                   "Ref":"AWS::Region"
                 },
-                "\n"
+                "\n",
+                "echo var >> /var/test.txt\n"
               ]
             ]
           }
@@ -249,6 +273,11 @@
             }
           }
         ]
+      },
+      "Metadata":{
+        "AWS::CloudFormation::Designer":{
+          "id":"0723cdc2-91db-4e74-9ab6-383930bc3bcc"
+        }
       }
     }
   },
@@ -287,6 +316,7 @@
       }
     },
     "WebsiteURL":{
+      "Description":"awslogs Website",
       "Value":{
         "Fn::Join":[
           "",
@@ -298,11 +328,45 @@
                 "PublicDnsName"
               ]
             },
-            "/DevOpsApplication/WebContent/WEB-INF/index.html"
+            "/awslogs/"
           ]
         ]
+      }
+    }
+  },
+  "Metadata":{
+    "AWS::CloudFormation::Designer":{
+      "0723cdc2-91db-4e74-9ab6-383930bc3bcc":{
+        "size":{
+          "width":60,
+          "height":60
+        },
+        "position":{
+          "x":60,
+          "y":90
+        },
+        "z":1,
+        "embeds":[
+          
+        ]
       },
-      "Description":"Application Website"
+      "b1702331-0733-4540-bb56-dc2998f136ec":{
+        "size":{
+          "width":60,
+          "height":60
+        },
+        "position":{
+          "x":180,
+          "y":90
+        },
+        "z":1,
+        "embeds":[
+          
+        ],
+        "ismemberof":[
+          "0723cdc2-91db-4e74-9ab6-383930bc3bcc"
+        ]
+      }
     }
   }
 }

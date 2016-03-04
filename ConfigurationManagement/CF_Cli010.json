@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion":"2010-09-09",
-  "Description":"CF_WebServer extends CF_EC2Base.json",
+  "Description":"CF_Cli.json extends on CF_EC2Base.json",
   "Parameters":{
     "KeyName":{
       "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -53,7 +53,8 @@
             "install_all":[
               "install_git",
               "install_cfn",
-              "install_app"
+              "install_app",
+              "install_httpd"
             ]
           },
           "install_git":{
@@ -129,7 +130,7 @@
               }
             }
           },
-          "install_app":{
+          "install_httpd":{
             "packages":{
               "yum":{
                 "httpd":[
@@ -137,8 +138,25 @@
                 ]
               }
             },
-            "sources":{
-              "/var/www/html/DevOpsApplication":"https://github.com/mike-lam2/DevOpsApplication/tarball/master"
+            "commands":{
+              "000-start":{
+                "command":"sudo echo \"start\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              },
+              "001-copy-log":{
+                "command":"sudo  cp -r /var/log /var/www/html/awslogs",
+                "ignoreErrors":"true"
+              },
+              "002-chmod-log":{
+                "command":"sudo  chmod -R a+r /var/www/html/awslogs",
+                "ignoreErrors":"true"
+              },
+              "999-end":{
+                "command":"sudo echo \"end\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              }
             },
             "services":{
               "sysvinit":{
@@ -146,6 +164,28 @@
                   "enabled":"true",
                   "ensureRunning":"true"
                 }
+              }
+            }
+          },
+          "install_app":{
+            "sources":{
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
+            "commands":{
+              "000-start":{
+                "command":"sudo echo \"start\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              },
+              "001-bash_profile":{
+                "command":"sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              },
+              "999-end":{
+                "command":"sudo echo \"end\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
               }
             }
           }
@@ -217,7 +257,8 @@
                 {
                   "Ref":"AWS::Region"
                 },
-                "\n"
+                "\n",
+                "echo var >> /var/test.txt\n"
               ]
             ]
           }
@@ -287,6 +328,7 @@
       }
     },
     "WebsiteURL":{
+      "Description":"awslogs Website",
       "Value":{
         "Fn::Join":[
           "",
@@ -298,11 +340,10 @@
                 "PublicDnsName"
               ]
             },
-            "/DevOpsApplication/WebContent/WEB-INF/index.html"
+            "/awslogs/"
           ]
         ]
-      },
-      "Description":"Application Website"
+      }
     }
   }
 }
