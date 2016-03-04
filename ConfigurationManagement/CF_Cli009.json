@@ -138,26 +138,6 @@
                 ]
               }
             },
-            "commands":{
-              "000-start":{
-                "command":"sudo echo \"start\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              },
-              "001-copy-log":{
-                "command":"sudo  cp -r /var/log /var/www/html/awslogs",
-                "ignoreErrors":"true"
-              },
-              "002-chmod-log":{
-                "command":"sudo  chmod -R a+r /var/www/html/awslogs",
-                "ignoreErrors":"true"
-              },
-              "999-end":{
-                "command":"sudo echo \"end\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              }
-            },
             "services":{
               "sysvinit":{
                 "httpd":{
@@ -189,6 +169,9 @@
               }
             }
           }
+        },
+        "AWS::CloudFormation::Designer":{
+          "id":"b1702331-0733-4540-bb56-dc2998f136ec"
         }
       },
       "Properties":{
@@ -290,6 +273,11 @@
             }
           }
         ]
+      },
+      "Metadata":{
+        "AWS::CloudFormation::Designer":{
+          "id":"0723cdc2-91db-4e74-9ab6-383930bc3bcc"
+        }
       }
     }
   },
@@ -342,6 +330,41 @@
             },
             "/awslogs/"
           ]
+        ]
+      }
+    }
+  },
+  "Metadata":{
+    "AWS::CloudFormation::Designer":{
+      "0723cdc2-91db-4e74-9ab6-383930bc3bcc":{
+        "size":{
+          "width":60,
+          "height":60
+        },
+        "position":{
+          "x":60,
+          "y":90
+        },
+        "z":1,
+        "embeds":[
+          
+        ]
+      },
+      "b1702331-0733-4540-bb56-dc2998f136ec":{
+        "size":{
+          "width":60,
+          "height":60
+        },
+        "position":{
+          "x":180,
+          "y":90
+        },
+        "z":1,
+        "embeds":[
+          
+        ],
+        "ismemberof":[
+          "0723cdc2-91db-4e74-9ab6-383930bc3bcc"
         ]
       }
     }
