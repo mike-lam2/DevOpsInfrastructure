@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "CF_Cli.json based on CF_EC2Base.json",
+  "Description": "CF_Cli.json extends on CF_EC2Base.json",
   "Parameters": {
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
@@ -129,27 +129,24 @@
           },
           "install_app": {
             "sources": {
-              "~/": "https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+              "/home/ec2-user/DevOpsInfrastructure": "https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
             },
-            "commands" : {
-              "bash_profile1" : {
-                "command": "echo found DevOpsInfrastructure/.bash_profile >> result.txt",
-                "env": {"MAGIC": "I come from the environment!"},
-                "cwd": "~",
-                "test": "test ! -e DevOpsInfrastructure/.bash_profile",
-                "ignoreErrors": "false"
-              },
-              "bash_profile2" : {
-                "command": "echo found DevOpsInfrastructure/.bash_profile >> result.txt",
-                "env": {"MAGIC": "I come from the environment!"},
-                "cwd": "~",
-                "test": "test  -e DevOpsInfrastructure/.bash_profile",
-                "ignoreErrors": "false"
-              },
-              "bash_profile_seq" : {
-                "command": ["test -e DevOpsInfrastructure/.bash_profile","OUT=$?","echo test -e DevOpsInfrastructure/.bash_profile RC=$OUT >> result.txt"],
-                "cwd": "~"
-              }              
+            "commands" : {         
+              "000-start" : {
+                "command": "sudo echo \"start\" >> result.txt",
+                "cwd": "/home/ec2-user/",
+                "ignoreErrors": "true"
+              },                          
+              "001-bash_profile" : {
+                "command": "sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
+                "cwd": "/home/ec2-user/",
+                "ignoreErrors": "true"
+              },                          
+              "999-end" : {
+                "command": "sudo echo \"end\" >> result.txt",
+                "cwd": "/home/ec2-user/",
+                "ignoreErrors": "true"
+              }                         
             }
           }
         }
