@@ -152,14 +152,6 @@
                 "command":"sudo  chmod -R a+r /var/www/html/awslogs",
                 "ignoreErrors":"true"
               },
-              "003-copy-githooks":{
-                "command":"sudo  cp -r /home/ec2-user/DevOpsInfrastructure/ConfigurationManagement/git_test.php /var/www/html/githooks/git_test.php",
-                "ignoreErrors":"true"
-              },
-              "004-chmod-githooks":{
-                "command":"sudo  chmod -R a+r /var/www/html/githooks",
-                "ignoreErrors":"true"
-              },
               "999-end":{
                 "command":"sudo echo \"end\" >> result.txt",
                 "cwd":"/home/ec2-user/",
