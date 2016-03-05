@@ -143,28 +143,6 @@
             "sources":{
               "/var/www/html/DevOpsApplication":"https://github.com/mike-lam2/DevOpsApplication/tarball/master"
             },
-            "commands":{
-              "000-chmod-html":{
-                "command":"sudo chmod a+w html",
-                "cwd":"/var/www",
-                "ignoreErrors":"true"
-              },
-              "001-git-DevOpsApplication":{
-                "command":"git clone cp https://github.com/mike-lam2/DevOpsApplication",
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
-              },
-              "002-chmod-DevOpsApplication":{
-                "command":"sudo chmod -R a+r DevOpsApplication",
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
-              },
-              "003-chmod-DevOpsApplication-sh":{
-                "command":"sudo chmod a+x DevOpsApplication/*.sh",
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
-              }              
-            },
             "services":{
               "sysvinit":{
                 "httpd":{
