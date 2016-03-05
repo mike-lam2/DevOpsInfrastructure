@@ -1,16 +1,7 @@
 {
 	"AWSTemplateFormatVersion":"2010-09-09",
-	"Description":"CF_WebServer extends CF_EC2Base.json",
+	"Description":"CF_WebServer extends CF_EC2Base.json. dependencies: App has build.sh, git_test.php. GitHub has hook to eip/git_test.php. EIP for stackname exist and no other stack can delete it",
 	"Parameters":{
-		"EIPName":{
-			"Description":"Elastic Ip to use",
-			"Type":"String",
-			"Default":"WebServerMaster",
-			"AllowedValues":[
-				"WebServerMaster"
-			],
-			"ConstraintDescription":"must be a valid EC2 instance type."
-		},
 		"KeyName":{
 			"Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
 			"Type":"AWS::EC2::KeyPair::KeyName",
@@ -58,8 +49,10 @@
 		"EIP":{
 			"WebServerMaster":{
 				"ip":"52.2.68.43"
-			}
-			
+			},
+			"WebServerProd":{
+				"ip":"52.4.104.159"
+			}			
 		}
 		
 	},
@@ -324,7 +317,7 @@
 					"Fn::FindInMap":[
 						"EIP",
 						{
-							"Ref":"EIPName"
+							"Ref":"AWS::StackName"
 						},
 						"ip"
 					]
@@ -398,7 +391,7 @@
 				"Fn::FindInMap":[
 					"EIP",
 					{
-						"Ref":"EIPName"
+						"Ref":"AWS::StackName"
 					},
 					"ip"
 				]
@@ -416,7 +409,7 @@
 							"Fn::FindInMap":[
 								"EIP",
 								{
-									"Ref":"EIPName"
+									"Ref":"AWS::StackName"
 								},
 								"ip"
 							]
