@@ -12,6 +12,5 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.boothen.jsonedit.validation.nature</nature>
 	</natures>
 </projectDescription>
