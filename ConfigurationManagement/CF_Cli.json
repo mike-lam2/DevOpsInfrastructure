@@ -51,18 +51,41 @@
         "AWS::CloudFormation::Init":{
           "configSets":{
             "install_all":[
-              "install_git",
+              "install_core",
               "install_cfn",
               "install_app",
               "install_httpd"
+            ],
+            "update_all":[
+              "update"
             ]
           },
-          "install_git":{
+          "install_core":{
             "packages":{
               "yum":{
                 "git":[
                   
                 ]
+              }
+            },
+            "files":{
+              "/etc/sysconfig/bash-prompt-xterm":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "echo -ne \"\\033]0;${USER}@",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      ":${PWD/#$HOME/~}\\007\"",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode":"0555",
+                "owner":"root",
+                "group":"root"
               }
             }
           },
@@ -105,7 +128,7 @@
                         "Ref":"AWS::StackName"
                       },
                       "         --resource Server ",
-                      "         --configsets install_all ",
+                      "         --configsets update_all ",
                       "         --region ",
                       {
                         "Ref":"AWS::Region"
@@ -144,12 +167,8 @@
                 "cwd":"/home/ec2-user/",
                 "ignoreErrors":"true"
               },
-              "001-copy-log":{
-                "command":"sudo  cp -r /var/log /var/www/html/awslogs",
-                "ignoreErrors":"true"
-              },
-              "002-chmod-log":{
-                "command":"sudo  chmod -R a+r /var/www/html/awslogs",
+              "010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
                 "ignoreErrors":"true"
               },
               "999-end":{
@@ -184,6 +203,15 @@
               },
               "999-end":{
                 "command":"sudo echo \"end\" >> result.txt",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
+              }
+            }
+          },
+          "update":{
+            "commands":{
+              "000-start-update":{
+                "command":"sudo echo \"start update\" >> result.txt",
                 "cwd":"/home/ec2-user/",
                 "ignoreErrors":"true"
               }
@@ -328,7 +356,7 @@
       }
     },
     "WebsiteURL":{
-      "Description":"awslogs Website",
+      "Description":"log Website",
       "Value":{
         "Fn::Join":[
           "",
@@ -340,7 +368,7 @@
                 "PublicDnsName"
               ]
             },
-            "/awslogs/"
+            "/log/"
           ]
         ]
       }

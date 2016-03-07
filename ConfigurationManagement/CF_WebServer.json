@@ -1,12 +1,39 @@
 {
   "AWSTemplateFormatVersion":"2010-09-09",
-  "Description":"CF_WebServer extends CF_EC2Base.json",
+  "Description":"CF_WebServer extends CF_EC2Base.json. dependencies: App has build.sh, git_test.php. GitHub has hook to eip/git_test.php. EIP for stackname exist and no other stack can delete it",
   "Parameters":{
     "KeyName":{
       "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type":"AWS::EC2::KeyPair::KeyName",
       "Default":"mikeaws1",
       "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
+    },
+    "Application":{
+      "Description":"Application name that exist in GitHub.",
+      "Type":"String",
+      "Default":"DevOpsApplication",
+      "ConstraintDescription":"Must exit in GitHub"
+    },
+    "EIPIp":{
+      "Description":"The Ip of the EIP: none=dont associate an EIP,master=52.2.68.43,prod=52.4.104.159. The EIP must exist. If a new EIP was defined and is not in the drop down then modify the parameters in the template",
+      "Type":"String",
+      "Default":"None",
+      "AllowedValues":[
+        "None",
+        "52.2.68.43",
+        "52.4.104.159"
+      ],
+      "ConstraintDescription":"Must use a listed EIP"
+    },
+    "BranchToClone":{
+      "Description":"The branch of the application to git clone. The branch must exist in git. If a new EIP was defined and is not in the drop down then modify the parameters in the template",
+      "Type":"String",
+      "Default":"master",
+      "AllowedValues":[
+        "master",
+        "Prod"
+      ],
+      "ConstraintDescription":"Must use a listed branch."
     },
     "InstanceType":{
       "Description":"WebServer EC2 instance type",
@@ -44,6 +71,20 @@
       }
     }
   },
+  "Conditions":{
+    "CondEIPInclude":{
+      "Fn::Not":[
+        {
+          "Fn::Equals":[
+            {
+              "Ref":"EIPIp"
+            },
+            "None"
+          ]
+        }
+      ]
+    }
+  },
   "Resources":{
     "Server":{
       "Type":"AWS::EC2::Instance",
@@ -51,17 +92,37 @@
         "AWS::CloudFormation::Init":{
           "configSets":{
             "install_all":[
-              "install_git",
+              "install_core",
               "install_cfn",
               "install_app"
             ]
           },
-          "install_git":{
+          "install_core":{
             "packages":{
               "yum":{
                 "git":[
                   
                 ]
+              }
+            },
+            "files":{
+              "/etc/sysconfig/bash-prompt-xterm":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "echo -ne \"\\033]0;${USER}@",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      ":${PWD/#$HOME/~}\\007\"",
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode":"0555",
+                "owner":"root",
+                "group":"root"
               }
             }
           },
@@ -140,8 +201,101 @@
                 ]
               }
             },
-            "sources":{
-              "/var/www/html/DevOpsApplication":"https://github.com/mike-lam2/DevOpsApplication/tarball/master"
+            "commands":{
+              "0010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
+                "ignoreErrors":"true"
+              },
+              "0015-chmod-html":{
+                "command":"sudo chmod a+w html",
+                "cwd":"/var/www",
+                "ignoreErrors":"true"
+              },
+              "010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
+                "ignoreErrors":"true"
+              },
+              "0020-git-Application":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "git clone https://github.com/mike-lam2/",
+                      {
+                        "Ref":"Application"
+                      },
+                      " --branch ",
+                      {
+                        "Ref":"BranchToClone"
+                      }
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html",
+                "ignoreErrors":"true"
+              },
+              "0030-chmod-build":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo chmod a+x ",
+                      {
+                        "Ref":"Application"
+                      },
+                      "/build.sh"
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html",
+                "ignoreErrors":"true"
+              },
+              "0040-build":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo chmod a+x ",
+                      {
+                        "Ref":"Application"
+                      },
+                      "/build.sh"
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html",
+                "ignoreErrors":"true"
+              },
+              "0050-chown-Application":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo chown -R apache ",
+                      {
+                        "Ref":"Application"
+                      }
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html",
+                "ignoreErrors":"true"
+              },
+              "0060-chgrp-Application":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo chgrp -R apache ",
+                      {
+                        "Ref":"Application"
+                      }
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html",
+                "ignoreErrors":"true"
+              }
             },
             "services":{
               "sysvinit":{
@@ -232,6 +386,18 @@
         }
       }
     },
+    "IPAssoc":{
+      "Type":"AWS::EC2::EIPAssociation",
+      "Condition":"CondEIPInclude",
+      "Properties":{
+        "InstanceId":{
+          "Ref":"Server"
+        },
+        "EIP":{
+          "Ref":"EIPIp"
+        }
+      }
+    },
     "InstanceSecurityGroup":{
       "Type":"AWS::EC2::SecurityGroup",
       "Properties":{
@@ -256,6 +422,58 @@
     }
   },
   "Outputs":{
+    "PublicIp":{
+      "Description":"Public IP address of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicIp"
+        ]
+      }
+    },
+    "WebsiteIpUrl":{
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/",
+            {
+              "Ref":"Application"
+            },
+            "/WebContent/WEB-INF/index.html"
+          ]
+        ]
+      },
+      "Description":"Application Website"
+    },
+    "WebsiteHomeIpUrl":{
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/",
+            {
+              "Ref":"Application"
+            }
+          ]
+        ]
+      },
+      "Description":"Website Home"
+    },
     "InstanceId":{
       "Description":"InstanceId of the newly created EC2 instance",
       "Value":{
@@ -280,16 +498,7 @@
         ]
       }
     },
-    "PublicIP":{
-      "Description":"Public IP address of the newly created EC2 instance",
-      "Value":{
-        "Fn::GetAtt":[
-          "Server",
-          "PublicIp"
-        ]
-      }
-    },
-    "WebsiteURL":{
+    "WebsiteDNSURL":{
       "Value":{
         "Fn::Join":[
           "",
@@ -301,7 +510,11 @@
                 "PublicDnsName"
               ]
             },
-            "/DevOpsApplication/WebContent/WEB-INF/index.html"
+            "/",
+            {
+              "Ref":"Application"
+            },
+            "/WebContent/WEB-INF/index.html"
           ]
         ]
       },
