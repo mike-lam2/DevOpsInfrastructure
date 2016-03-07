@@ -167,12 +167,8 @@
                 "cwd":"/home/ec2-user/",
                 "ignoreErrors":"true"
               },
-              "001-copy-log":{
-                "command":"sudo  cp -r /var/log /var/www/html/awslogs",
-                "ignoreErrors":"true"
-              },
-              "002-chmod-log":{
-                "command":"sudo  chmod -R a+r /var/www/html/awslogs",
+              "010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
                 "ignoreErrors":"true"
               },
               "999-end":{
@@ -360,7 +356,7 @@
       }
     },
     "WebsiteURL":{
-      "Description":"awslogs Website",
+      "Description":"log Website",
       "Value":{
         "Fn::Join":[
           "",
@@ -372,7 +368,7 @@
                 "PublicDnsName"
               ]
             },
-            "/awslogs/"
+            "/log/"
           ]
         ]
       }
