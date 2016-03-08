@@ -52,9 +52,9 @@
           "configSets":{
             "install_all":[
               "install_core",
+              "install_log",
               "install_cfn",
-              "install_app",
-              "install_httpd"
+              "install_app"
             ],
             "update_all":[
               "update"
@@ -153,7 +153,7 @@
               }
             }
           },
-          "install_httpd":{
+          "install_log":{
             "packages":{
               "yum":{
                 "httpd":[
@@ -162,18 +162,8 @@
               }
             },
             "commands":{
-              "000-start":{
-                "command":"sudo echo \"start\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              },
               "010-set-log":{
                 "command":"sudo  ln -s /var/log /var/www/html/log",
-                "ignoreErrors":"true"
-              },
-              "999-end":{
-                "command":"sudo echo \"end\" >> result.txt",
-                "cwd":"/home/ec2-user/",
                 "ignoreErrors":"true"
               }
             },
@@ -322,6 +312,33 @@
     }
   },
   "Outputs":{
+    "PublicIP":{
+      "Description":"Public IP address of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicIp"
+        ]
+      }
+    },
+    "WebsiteLogURL":{
+      "Description":"log Website",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/log/"
+          ]
+        ]
+      }
+    },
     "InstanceId":{
       "Description":"InstanceId of the newly created EC2 instance",
       "Value":{
@@ -343,33 +360,6 @@
         "Fn::GetAtt":[
           "Server",
           "PublicDnsName"
-        ]
-      }
-    },
-    "PublicIP":{
-      "Description":"Public IP address of the newly created EC2 instance",
-      "Value":{
-        "Fn::GetAtt":[
-          "Server",
-          "PublicIp"
-        ]
-      }
-    },
-    "WebsiteURL":{
-      "Description":"log Website",
-      "Value":{
-        "Fn::Join":[
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt":[
-                "Server",
-                "PublicDnsName"
-              ]
-            },
-            "/log/"
-          ]
         ]
       }
     }

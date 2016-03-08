@@ -93,6 +93,7 @@
           "configSets":{
             "install_all":[
               "install_core",
+              "install_log",
               "install_cfn",
               "install_app"
             ]
@@ -190,7 +191,31 @@
               }
             }
           },
+          "install_log":{
+            "packages":{
+              "yum":{
+                "httpd":[
+                  
+                ]
+              }
+            },
+            "commands":{
+              "010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
+                "ignoreErrors":"true"
+              }
+            },
+            "services":{
+              "sysvinit":{
+                "httpd":{
+                  "enabled":"true",
+                  "ensureRunning":"true"
+                }
+              }
+            }
+          },
           "install_app":{
+            "comments":"yum httpd again just in case install_log was removed of configset. yum will only install it once, assume the service will be unafacted by specify enable twice",
             "packages":{
               "yum":{
                 "httpd":[
@@ -202,17 +227,9 @@
               }
             },
             "commands":{
-              "0010-set-log":{
-                "command":"sudo  ln -s /var/log /var/www/html/log",
-                "ignoreErrors":"true"
-              },
               "0015-chmod-html":{
                 "command":"sudo chmod a+w html",
                 "cwd":"/var/www",
-                "ignoreErrors":"true"
-              },
-              "010-set-log":{
-                "command":"sudo  ln -s /var/log /var/www/html/log",
                 "ignoreErrors":"true"
               },
               "0020-git-Application":{
@@ -422,7 +439,7 @@
     }
   },
   "Outputs":{
-    "PublicIp":{
+    "PublicIP":{
       "Description":"Public IP address of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
@@ -474,6 +491,24 @@
       },
       "Description":"Website Home"
     },
+    "WebsiteLogURL":{
+      "Description":"log Website",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/log/"
+          ]
+        ]
+      }
+    },
     "InstanceId":{
       "Description":"InstanceId of the newly created EC2 instance",
       "Value":{
@@ -497,28 +532,6 @@
           "PublicDnsName"
         ]
       }
-    },
-    "WebsiteDNSURL":{
-      "Value":{
-        "Fn::Join":[
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt":[
-                "Server",
-                "PublicDnsName"
-              ]
-            },
-            "/",
-            {
-              "Ref":"Application"
-            },
-            "/WebContent/WEB-INF/index.html"
-          ]
-        ]
-      },
-      "Description":"Application Website"
     }
   }
 }
