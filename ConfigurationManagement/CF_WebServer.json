@@ -112,6 +112,9 @@
                 ]
               }
             },
+            "sources":{
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
             "files":{
               "/etc/sysconfig/bash-prompt-xterm":{
                 "content":{
@@ -130,6 +133,13 @@
                 "mode":"0555",
                 "owner":"root",
                 "group":"root"
+              }
+            },
+            "commands":{
+              "010-core-bash_profile":{
+                "command":"sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
               }
             },
             "services":{

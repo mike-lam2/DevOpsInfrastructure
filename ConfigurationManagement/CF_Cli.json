@@ -74,6 +74,9 @@
                 ]
               }
             },
+            "sources":{
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
             "files":{
               "/etc/sysconfig/bash-prompt-xterm":{
                 "content":{
@@ -92,6 +95,13 @@
                 "mode":"0555",
                 "owner":"root",
                 "group":"root"
+              }
+            },
+            "commands":{
+              "010-core-bash_profile":{
+                "command":"sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
               }
             },
             "services":{
@@ -176,26 +186,7 @@
             }
           },
           "install_app":{
-            "sources":{
-              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
-            },
-            "commands":{
-              "000-start":{
-                "command":"sudo echo \"start\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              },
-              "001-bash_profile":{
-                "command":"sudo cp DevOpsInfrastructure/ConfigurationManagement/.bash_profile .bash_profile",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              },
-              "999-end":{
-                "command":"sudo echo \"end\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              }
-            }
+            "comments":"nothing to install just for the cli"
           },
           "update":{
             "commands":{
