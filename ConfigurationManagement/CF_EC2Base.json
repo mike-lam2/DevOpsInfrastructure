@@ -3,7 +3,7 @@
   "Description":"CF_EC2Base.json",
   "Parameters":{
     "KeyName":{
-      "Description":"NOT KEEPING THIS UP TO DATE FOR NOW AS CLI MAY BE ENOUGH!!! Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type":"AWS::EC2::KeyPair::KeyName",
       "Default":"mikeaws1",
       "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
