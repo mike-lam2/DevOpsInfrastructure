@@ -229,7 +229,7 @@
                   
                 ]
               }
-            },
+            }, 
             "commands":{
               "0015-chmod-html":{
                 "command":"sudo chmod a+w html",
