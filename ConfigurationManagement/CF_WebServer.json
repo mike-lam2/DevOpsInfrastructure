@@ -196,7 +196,11 @@
               "yum":{
                 "httpd":[
                   
+                ],
+                "php":[
+                  
                 ]
+                
               }
             },
             "commands":{
