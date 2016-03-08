@@ -52,6 +52,7 @@
           "configSets":{
             "install_all":[
               "install_core",
+              "install_log",
               "install_cfn",
               "install_app"
             ]
@@ -149,6 +150,29 @@
               }
             }
           },
+          "install_log":{
+            "packages":{
+              "yum":{
+                "httpd":[
+                  
+                ]
+              }
+            },
+            "commands":{
+              "010-set-log":{
+                "command":"sudo  ln -s /var/log /var/www/html/log",
+                "ignoreErrors":"true"
+              }
+            },
+            "services":{
+              "sysvinit":{
+                "httpd":{
+                  "enabled":"true",
+                  "ensureRunning":"true"
+                }
+              }
+            }
+          },
           "install_app":{
             
           }
@@ -225,11 +249,11 @@
               ]
             ]
           }
-        }
-      },
-      "CreationPolicy":{
-        "ResourceSignal":{
-          "Timeout":"PT15M"
+        },
+        "CreationPolicy":{
+          "ResourceSignal":{
+            "Timeout":"PT15M"
+          }
         }
       }
     },
@@ -238,6 +262,12 @@
       "Properties":{
         "GroupDescription":"Enable SSH access via port 22",
         "SecurityGroupIngress":[
+          {
+            "IpProtocol":"tcp",
+            "FromPort":"80",
+            "ToPort":"80",
+            "CidrIp":"0.0.0.0/0"
+          },
           {
             "IpProtocol":"tcp",
             "FromPort":"22",
@@ -251,6 +281,33 @@
     }
   },
   "Outputs":{
+    "PublicIP":{
+      "Description":"Public IP address of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicIp"
+        ]
+      }
+    },
+    "WebsiteLogURL":{
+      "Description":"log Website",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/log/"
+          ]
+        ]
+      }
+    },
     "InstanceId":{
       "Description":"InstanceId of the newly created EC2 instance",
       "Value":{
@@ -272,15 +329,6 @@
         "Fn::GetAtt":[
           "Server",
           "PublicDnsName"
-        ]
-      }
-    },
-    "PublicIP":{
-      "Description":"Public IP address of the newly created EC2 instance",
-      "Value":{
-        "Fn::GetAtt":[
-          "Server",
-          "PublicIp"
         ]
       }
     }
