@@ -62,6 +62,12 @@
               "yum":{
                 "git":[
                   
+                ],
+                "httpd":[
+                  
+                ],
+                "php":[
+                  
                 ]
               }
             },
@@ -83,6 +89,14 @@
                 "mode":"0555",
                 "owner":"root",
                 "group":"root"
+              }
+            },
+            "services":{
+              "sysvinit":{
+                "httpd":{
+                  "enabled":"true",
+                  "ensureRunning":"true"
+                }
               }
             }
           },
@@ -151,13 +165,6 @@
             }
           },
           "install_log":{
-            "packages":{
-              "yum":{
-                "httpd":[
-                  
-                ]
-              }
-            },
             "commands":{
               "010-set-log":{
                 "command":"sudo  ln -s /var/log /var/www/html/log",

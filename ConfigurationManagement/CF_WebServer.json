@@ -93,6 +93,7 @@
           "configSets":{
             "install_all":[
               "install_core",
+              "install_log",
               "install_cfn",
               "install_app"
             ]
@@ -101,6 +102,12 @@
             "packages":{
               "yum":{
                 "git":[
+                  
+                ],
+                "httpd":[
+                  
+                ],
+                "php":[
                   
                 ]
               }
@@ -123,6 +130,14 @@
                 "mode":"0555",
                 "owner":"root",
                 "group":"root"
+              }
+            },
+            "services":{
+              "sysvinit":{
+                "httpd":{
+                  "enabled":"true",
+                  "ensureRunning":"true"
+                }
               }
             }
           },
@@ -190,29 +205,20 @@
               }
             }
           },
-          "install_app":{
-            "packages":{
-              "yum":{
-                "httpd":[
-                  
-                ],
-                "php":[
-                  
-                ]
-              }
-            },
+          "install_log":{
             "commands":{
-              "0010-set-log":{
+              "010-set-log":{
                 "command":"sudo  ln -s /var/log /var/www/html/log",
                 "ignoreErrors":"true"
-              },
+              }
+            }
+          },
+          "install_app":{
+            "comments":"yum httpd again just in case install_log was removed of configset. yum will only install it once, assume the service will be unafacted by specify enable twice",
+            "commands":{
               "0015-chmod-html":{
                 "command":"sudo chmod a+w html",
                 "cwd":"/var/www",
-                "ignoreErrors":"true"
-              },
-              "010-set-log":{
-                "command":"sudo  ln -s /var/log /var/www/html/log",
                 "ignoreErrors":"true"
               },
               "0020-git-Application":{
@@ -295,14 +301,6 @@
                 },
                 "cwd":"/var/www/html",
                 "ignoreErrors":"true"
-              }
-            },
-            "services":{
-              "sysvinit":{
-                "httpd":{
-                  "enabled":"true",
-                  "ensureRunning":"true"
-                }
               }
             }
           }
@@ -422,12 +420,30 @@
     }
   },
   "Outputs":{
-    "PublicIp":{
+    "PublicIP":{
       "Description":"Public IP address of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
           "PublicIp"
+        ]
+      }
+    },
+    "WebsiteLogURL":{
+      "Description":"log Website",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/log/"
+          ]
         ]
       }
     },
@@ -451,7 +467,7 @@
           ]
         ]
       },
-      "Description":"Application Website"
+      "Description":"ApplicationWebsite"
     },
     "WebsiteHomeIpUrl":{
       "Value":{
@@ -472,7 +488,7 @@
           ]
         ]
       },
-      "Description":"Website Home"
+      "Description":"WebsiteHome"
     },
     "InstanceId":{
       "Description":"InstanceId of the newly created EC2 instance",
@@ -497,28 +513,6 @@
           "PublicDnsName"
         ]
       }
-    },
-    "WebsiteDNSURL":{
-      "Value":{
-        "Fn::Join":[
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt":[
-                "Server",
-                "PublicDnsName"
-              ]
-            },
-            "/",
-            {
-              "Ref":"Application"
-            },
-            "/WebContent/WEB-INF/index.html"
-          ]
-        ]
-      },
-      "Description":"Application Website"
     }
   }
 }
