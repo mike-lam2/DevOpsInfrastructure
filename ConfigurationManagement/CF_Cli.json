@@ -146,18 +146,7 @@
                       "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
                       "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/opt/aws/bin/cfn-init -v ",
-                      "         --stack ",
-                      {
-                        "Ref":"AWS::StackName"
-                      },
-                      "         --resource Server ",
-                      "         --configsets update_all ",
-                      "         --region ",
-                      {
-                        "Ref":"AWS::Region"
-                      },
-                      "\n",
+                      "action=/home/ec2-user/updateStack.sh\n",
                       "runas=root\n"
                     ]
                   ]
