@@ -164,6 +164,17 @@
                 }
               }
             },
+            "commands":{
+              "010-set-cfn-log":{
+                "command":"sudo  ln -s /etc/cfn /var/www/html/cfn",
+                "ignoreErrors":"true"
+              },
+              "0015-chmod-html":{
+                "command":"sudo chmod -R a+r *",
+                "cwd":"/etc/cfn",
+                "ignoreErrors":"true"
+              }
+            },
             "services":{
               "sysvinit":{
                 "cfn-hup":{
@@ -325,6 +336,24 @@
               ]
             },
             "/log/"
+          ]
+        ]
+      }
+    },
+    "WebsiteCfnURL":{
+      "Description":"cfn Website",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/cfn/"
           ]
         ]
       }
