@@ -191,10 +191,21 @@
           "update":{
             "commands":{
               "000-start-update":{
-                "command":"sudo echo \"start update\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
-              }
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo echo \"update for build number",
+                      {
+                        "Ref":"BuildNumber"
+                      },
+                      "\" >> result.txt"
+                    ]
+                  ]
+                }
+              },
+              "cwd":"/home/ec2-user/",
+              "ignoreErrors":"true"
             }
           }
         }
