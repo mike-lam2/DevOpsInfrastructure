@@ -196,6 +196,7 @@
                         "Ref":"AWS::Region"
                       },
                       "\n",
+                      "interval=1\n",
                       "runas=root\n"
                     ]
                   ]

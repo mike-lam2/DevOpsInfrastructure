@@ -8,6 +8,14 @@
       "Default":"mikeaws1",
       "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
     },
+    "UpdateTest":{
+      "Description":"this can be used to test update",
+      "Type":"String"
+    },
+    "UpdateTest1":{
+      "Description":"this can be used to test update1",
+      "Type":"String"
+    },
     "InstanceType":{
       "Description":"WebServer EC2 instance type",
       "Type":"String",
@@ -53,11 +61,18 @@
             "install_all":[
               "install_core",
               "install_log",
-              "install_cfn",
-              "install_app"
+              "install_app",
+              "update",
+              "install_cfn"
             ],
             "update_all":[
               "update"
+            ],
+            "update_0":[
+              "update"
+            ],
+            "update_1":[
+              "update1"
             ]
           },
           "install_core":{
@@ -130,7 +145,8 @@
                       {
                         "Ref":"AWS::Region"
                       },
-                      "\n"
+                      "\n",
+                      "interval=1\n"
                     ]
                   ]
                 },
@@ -152,7 +168,57 @@
                         "Ref":"AWS::StackName"
                       },
                       "         --resource Server ",
-                      "         --configsets update_all ",
+                      "         --configsets install_all ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              },
+              "/etc/cfn/hooks.d/cfn-update.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[cfn-update-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init.update\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_0 ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              },
+              "/etc/cfn/hooks.d/cfn-update1.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[cfn-update1-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init.update1\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_1 ",
                       "         --region ",
                       {
                         "Ref":"AWS::Region"
@@ -182,7 +248,9 @@
                   "ensureRunning":"true",
                   "files":[
                     "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf",
+                    "/etc/cfn/hooks.d/cfn-update.conf",
+                    "/etc/cfn/hooks.d/cfn-update1.conf"
                   ]
                 }
               }
@@ -201,22 +269,42 @@
           },
           "update":{
             "commands":{
-              "000-start-update":{
+              "000-update":{
                 "command":{
                   "Fn::Join":[
                     "",
                     [
-                      "sudo echo \"update for build number",
+                      "sudo echo \"",
                       {
-                        "Ref":"BuildNumber"
+                        "Ref":"UpdateTest"
                       },
-                      "\" >> result.txt"
+                      "\" >> StackUpdated.txt"
                     ]
                   ]
-                }
-              },
-              "cwd":"/home/ec2-user/",
-              "ignoreErrors":"true"
+                },
+                "cwd":"/var/www/html/log",
+                "ignoreErrors":"true"
+              }
+            }
+          },
+          "update1":{
+            "commands":{
+              "000-update1":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo echo \"",
+                      {
+                        "Ref":"UpdateTest1"
+                      },
+                      "\" >> StackUpdated1.txt"
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html/log",
+                "ignoreErrors":"true"
+              }
             }
           }
         }
@@ -287,8 +375,7 @@
                 {
                   "Ref":"AWS::Region"
                 },
-                "\n",
-                "echo var >> /var/test.txt\n"
+                "\n"
               ]
             ]
           }
