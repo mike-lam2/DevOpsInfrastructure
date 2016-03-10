@@ -8,6 +8,10 @@
       "Default":"mikeaws1",
       "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
     },
+    "UpdateTest":{
+      "Description":"this can be used to test update",
+      "Type":"String"
+    },
     "InstanceType":{
       "Description":"WebServer EC2 instance type",
       "Type":"String",
@@ -53,8 +57,9 @@
             "install_all":[
               "install_core",
               "install_log",
-              "install_cfn",
-              "install_app"
+              "install_app",
+              "update",
+              "install_cfn"
             ],
             "update_all":[
               "update"
@@ -75,8 +80,7 @@
               }
             },
             "sources":{
-              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master",
-              "/home/ec2-user/test1":"https://github.com/mike-lam2/test1/tarball/master"
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
             },
             "files":{
               "/etc/sysconfig/bash-prompt-xterm":{
@@ -131,7 +135,8 @@
                       {
                         "Ref":"AWS::Region"
                       },
-                      "\n"
+                      "\n",
+                      "interval=1\n"
                     ]
                   ]
                 },
@@ -147,7 +152,18 @@
                       "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
                       "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/home/ec2-user/updateStack.sh\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_all ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
                       "runas=root\n"
                     ]
                   ]
@@ -191,8 +207,19 @@
           },
           "update":{
             "commands":{
-              "000-start-update":{
-                "command":"sudo echo \"start update\" >> result.txt",
+              "000-update":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo echo \"",
+                      {
+                        "Ref":"UpdateTest"
+                      },
+                      "\" >> result.txt"
+                    ]
+                  ]
+                },
                 "cwd":"/home/ec2-user/",
                 "ignoreErrors":"true"
               }
@@ -266,8 +293,7 @@
                 {
                   "Ref":"AWS::Region"
                 },
-                "\n",
-                "echo var >> /var/test.txt\n"
+                "\n"
               ]
             ]
           }
