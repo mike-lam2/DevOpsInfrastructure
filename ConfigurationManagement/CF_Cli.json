@@ -216,11 +216,11 @@
                       {
                         "Ref":"UpdateTest"
                       },
-                      "\" >> result.txt"
+                      "\" >> StackUpdated.txt"
                     ]
                   ]
                 },
-                "cwd":"/home/ec2-user/",
+                "cwd":"/var/www/html/log",
                 "ignoreErrors":"true"
               }
             }
