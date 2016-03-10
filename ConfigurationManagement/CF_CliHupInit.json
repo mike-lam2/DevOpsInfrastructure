@@ -8,6 +8,16 @@
       "Default":"mikeaws1",
       "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
     },
+    "UpdateTest":{
+      "Description":"this can be used to test update,specify a directory to create with clone in ec2-user",
+      "Type":"String",
+      "Default":"test1",
+      "AllowedValues":[
+        "test1",
+        "DevOpsApplication",
+        "DevOpsInfrastructure"
+      ]
+    },
     "InstanceType":{
       "Description":"WebServer EC2 instance type",
       "Type":"String",
@@ -53,8 +63,9 @@
             "install_all":[
               "install_core",
               "install_log",
-              "install_cfn",
-              "install_app"
+              "install_app",
+              "update",
+              "install_cfn"
             ],
             "update_all":[
               "update"
@@ -75,8 +86,7 @@
               }
             },
             "sources":{
-              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master",
-              "/home/ec2-user/test1":"https://github.com/mike-lam2/test1/tarball/master"
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
             },
             "files":{
               "/etc/sysconfig/bash-prompt-xterm":{
@@ -131,7 +141,8 @@
                       {
                         "Ref":"AWS::Region"
                       },
-                      "\n"
+                      "\n",
+                      "interval=1\n"
                     ]
                   ]
                 },
@@ -147,22 +158,22 @@
                       "[cfn-auto-reloader-hook]\n",
                       "triggers=post.update\n",
                       "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/home/ec2-user/updateStack.sh\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_all ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
                       "runas=root\n"
                     ]
                   ]
                 }
-              }
-            },
-            "commands":{
-              "010-set-cfn-log":{
-                "command":"sudo  ln -s /etc/cfn /var/www/html/cfn",
-                "ignoreErrors":"true"
-              },
-              "0015-chmod-html":{
-                "command":"sudo chmod -R a+r *",
-                "cwd":"/etc/cfn",
-                "ignoreErrors":"true"
               }
             },
             "services":{
@@ -190,11 +201,15 @@
             "comments":"nothing to install just for the cli"
           },
           "update":{
-            "commands":{
-              "000-start-update":{
-                "command":"sudo echo \"start update\" >> result.txt",
-                "cwd":"/home/ec2-user/",
-                "ignoreErrors":"true"
+            "sources":{
+              "/home/ec2-user/UpdateTest"
+              :{"Fn::Join":[
+                    "",
+                    ["https://github.com/mike-lam2/",
+                    {"Ref":"UpdateTest"},
+                    "/tarball/master"
+                    ]
+                    ]
               }
             }
           }
@@ -266,8 +281,7 @@
                 {
                   "Ref":"AWS::Region"
                 },
-                "\n",
-                "echo var >> /var/test.txt\n"
+                "\n"
               ]
             ]
           }
@@ -326,24 +340,6 @@
               ]
             },
             "/log/"
-          ]
-        ]
-      }
-    },
-    "WebsiteCfnURL":{
-      "Description":"cfn Website",
-      "Value":{
-        "Fn::Join":[
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt":[
-                "Server",
-                "PublicIp"
-              ]
-            },
-            "/cfn/"
           ]
         ]
       }
