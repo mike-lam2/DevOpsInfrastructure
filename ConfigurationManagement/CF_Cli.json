@@ -12,6 +12,10 @@
       "Description":"this can be used to test update",
       "Type":"String"
     },
+    "UpdateTest1":{
+      "Description":"this can be used to test update1",
+      "Type":"String"
+    },
     "InstanceType":{
       "Description":"WebServer EC2 instance type",
       "Type":"String",
@@ -63,6 +67,12 @@
             ],
             "update_all":[
               "update"
+            ],
+            "update_0":[
+              "update"
+            ],
+            "update_1":[
+              "update1"
             ]
           },
           "install_core":{
@@ -158,7 +168,57 @@
                         "Ref":"AWS::StackName"
                       },
                       "         --resource Server ",
-                      "         --configsets update_all ",
+                      "         --configsets install_all ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              },
+              "/etc/cfn/hooks.d/cfn-update.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[cfn-update-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init.update\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_0 ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              },
+              "/etc/cfn/hooks.d/cfn-update1.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[cfn-update1-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init.update1\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets update_1 ",
                       "         --region ",
                       {
                         "Ref":"AWS::Region"
@@ -217,6 +277,26 @@
                         "Ref":"UpdateTest"
                       },
                       "\" >> StackUpdated.txt"
+                    ]
+                  ]
+                },
+                "cwd":"/var/www/html/log",
+                "ignoreErrors":"true"
+              }
+            }
+          },
+          "update1":{
+            "commands":{
+              "000-update1":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo echo \"",
+                      {
+                        "Ref":"UpdateTest1"
+                      },
+                      "\" >> StackUpdated1.txt"
                     ]
                   ]
                 },
