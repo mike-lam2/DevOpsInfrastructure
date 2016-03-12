@@ -228,7 +228,7 @@
                 "ignoreErrors":"true"
               },
               "20_run_chef":{
-                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::default,infrastructure::appplication]'",
+                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::webServer]'",
                 "cwd":"/var/chef/chef-repo/cookbooks",
                 "ignoreErrors":"true"
               }
