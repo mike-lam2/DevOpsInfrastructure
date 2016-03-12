@@ -264,7 +264,7 @@
                       "\" >> /var/log/buildVersion.txt"
                     ]
                   ]
-                }
+                },
                 "ignoreErrors":"true"
               }
             }
