@@ -137,292 +137,293 @@
                     "",
                     [
                       "default['default']['StackName'] = '",
-                      "Ref":"AWS::StackName"
-                    },
-                    "'\n",
-                    "\n"
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "'\n",
+                      "\n"
+                    ]
                   ]
-                ]
+                },
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              }
+            },
+            "commands":{
+              "05_generate_cookbook":{
+                "command":"chef generate cookbook infrastructure",
+                "cwd":"/var/chef/chef-repo/cookbooks",
+                "ignoreErrors":"true"
               },
-              "mode":"000400",
-              "owner":"root",
-              "group":"root"
-            }
-          },
-          "commands":{
-            "05_generate_cookbook":{
-              "command":"chef generate cookbook infrastructure",
-              "cwd":"/var/chef/chef-repo/cookbooks",
-              "ignoreErrors":"true"
-            },
-            "10_cp_cookbook":{
-              "command":"cp -r /home/ec2-user/DevOpsInfrastructure/ConfigurationManagement/infrastructure /var/chef/chef-repo/cookbooks/",
-              "ignoreErrors":"true"
-            },
-            "20_run_chef":{
-              "command":"chef-client --local-mode --runlist 'recipe[infrastructure]'",
-              "cwd":"/var/chef/chef-repo/cookbooks",
-              "ignoreErrors":"true"
-            }
-          }
-        },
-        "install_chefdk":{
-          "packages":{
-            "rpm":{
-              "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
-            }
-          }
-        },
-        "install_cfn":{
-          "files":{
-            "/etc/cfn/cfn-hup.conf":{
-              "content":{
-                "Fn::Join":[
-                  "",
-                  [
-                    "[main]\n",
-                    "stack=",
-                    {
-                      "Ref":"AWS::StackId"
-                    },
-                    "\n",
-                    "region=",
-                    {
-                      "Ref":"AWS::Region"
-                    },
-                    "\n",
-                    "interval=1\n"
-                  ]
-                ]
+              "10_cp_cookbook":{
+                "command":"cp -r /home/ec2-user/DevOpsInfrastructure/ConfigurationManagement/infrastructure /var/chef/chef-repo/cookbooks/",
+                "ignoreErrors":"true"
               },
-              "mode":"000400",
-              "owner":"root",
-              "group":"root"
-            },
-            "/etc/cfn/hooks.d/cfn-auto-reloader.conf":{
-              "content":{
-                "Fn::Join":[
-                  "",
-                  [
-                    "[cfn-auto-reloader-hook]\n",
-                    "triggers=post.update\n",
-                    "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
-                    "action=/opt/aws/bin/cfn-init -v ",
-                    "         --stack ",
-                    {
-                      "Ref":"AWS::StackName"
-                    },
-                    "         --resource Server ",
-                    "         --configsets install_all ",
-                    "         --region ",
-                    {
-                      "Ref":"AWS::Region"
-                    },
-                    "\n",
-                    "runas=root\n"
-                  ]
-                ]
+              "20_run_chef":{
+                "command":"chef-client --local-mode --runlist 'recipe[infrastructure]'",
+                "cwd":"/var/chef/chef-repo/cookbooks",
+                "ignoreErrors":"true"
               }
             }
           },
-          "commands":{
-            "010-set-cfn-log":{
-              "command":"sudo  ln -s /etc/cfn /var/www/html/cfn",
-              "ignoreErrors":"true"
-            },
-            "0015-chmod-html":{
-              "command":"sudo chmod -R a+r *",
-              "cwd":"/etc/cfn",
-              "ignoreErrors":"true"
+          "install_chefdk":{
+            "packages":{
+              "rpm":{
+                "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
+              }
             }
           },
-          "services":{
-            "sysvinit":{
-              "cfn-hup":{
-                "enabled":"true",
-                "ensureRunning":"true",
-                "files":[
-                  "/etc/cfn/cfn-hup.conf",
-                  "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
-                ]
+          "install_cfn":{
+            "files":{
+              "/etc/cfn/cfn-hup.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[main]\n",
+                      "stack=",
+                      {
+                        "Ref":"AWS::StackId"
+                      },
+                      "\n",
+                      "region=",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "interval=1\n"
+                    ]
+                  ]
+                },
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              },
+              "/etc/cfn/hooks.d/cfn-auto-reloader.conf":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "[cfn-auto-reloader-hook]\n",
+                      "triggers=post.update\n",
+                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
+                      "action=/opt/aws/bin/cfn-init -v ",
+                      "         --stack ",
+                      {
+                        "Ref":"AWS::StackName"
+                      },
+                      "         --resource Server ",
+                      "         --configsets install_all ",
+                      "         --region ",
+                      {
+                        "Ref":"AWS::Region"
+                      },
+                      "\n",
+                      "runas=root\n"
+                    ]
+                  ]
+                }
+              }
+            },
+            "commands":{
+              "010-set-cfn-log":{
+                "command":"sudo  ln -s /etc/cfn /var/www/html/cfn",
+                "ignoreErrors":"true"
+              },
+              "0015-chmod-html":{
+                "command":"sudo chmod -R a+r *",
+                "cwd":"/etc/cfn",
+                "ignoreErrors":"true"
+              }
+            },
+            "services":{
+              "sysvinit":{
+                "cfn-hup":{
+                  "enabled":"true",
+                  "ensureRunning":"true",
+                  "files":[
+                    "/etc/cfn/cfn-hup.conf",
+                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                  ]
+                }
+              }
+            }
+          },
+          "buildVersion":{
+            "commands":{
+              "000-buildVersion":{
+                "command":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "sudo echo \"",
+                      {
+                        "Ref":"BuildVersion"
+                      },
+                      "\" >> buildVersion.txt"
+                    ]
+                  ]
+                },
+                "cwd":"/home/ec2-user/",
+                "ignoreErrors":"true"
               }
             }
           }
+        }
+      },
+      "Properties":{
+        "InstanceType":{
+          "Ref":"InstanceType"
         },
-        "buildVersion":{
-          "commands":{
-            "000-buildVersion":{
-              "command":{
-                "Fn::Join":[
-                  "",
-                  [
-                    "sudo echo \"",
-                    {
-                      "Ref":"BuildVersion"
-                    },
-                    "\" >> buildVersion.txt"
-                  ]
-                ]
-              },
-              "cwd":"/home/ec2-user/",
-              "ignoreErrors":"true"
+        "SecurityGroups":[
+          {
+            "Ref":"InstanceSecurityGroup"
+          }
+        ],
+        "KeyName":{
+          "Ref":"KeyName"
+        },
+        "ImageId":{
+          "Fn::FindInMap":[
+            "AWSRegionArch2AMI",
+            {
+              "Ref":"AWS::Region"
+            },
+            {
+              "Fn::FindInMap":[
+                "AWSInstanceType2Arch",
+                {
+                  "Ref":"InstanceType"
+                },
+                "Arch"
+              ]
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":{
+              "Ref":"AWS::StackName"
             }
           }
+        ],
+        "UserData":{
+          "Fn::Base64":{
+            "Fn::Join":[
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref":"AWS::StackName"
+                },
+                "         --resource Server ",
+                "         --configsets install_all ",
+                "         --region ",
+                {
+                  "Ref":"AWS::Region"
+                },
+                "\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref":"AWS::StackName"
+                },
+                "         --resource Server ",
+                "         --region ",
+                {
+                  "Ref":"AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy":{
+        "ResourceSignal":{
+          "Timeout":"PT15M"
         }
       }
     },
-    "Properties":{
-      "InstanceType":{
-        "Ref":"InstanceType"
-      },
-      "SecurityGroups":[
-        {
-          "Ref":"InstanceSecurityGroup"
-        }
-      ],
-      "KeyName":{
-        "Ref":"KeyName"
-      },
-      "ImageId":{
-        "Fn::FindInMap":[
-          "AWSRegionArch2AMI",
+    "InstanceSecurityGroup":{
+      "Type":"AWS::EC2::SecurityGroup",
+      "Properties":{
+        "GroupDescription":"Enable SSH access via port 22",
+        "SecurityGroupIngress":[
           {
-            "Ref":"AWS::Region"
+            "IpProtocol":"tcp",
+            "FromPort":"80",
+            "ToPort":"80",
+            "CidrIp":"0.0.0.0/0"
           },
           {
-            "Fn::FindInMap":[
-              "AWSInstanceType2Arch",
-              {
-                "Ref":"InstanceType"
-              },
-              "Arch"
-            ]
+            "IpProtocol":"tcp",
+            "FromPort":"22",
+            "ToPort":"22",
+            "CidrIp":{
+              "Ref":"SSHLocation"
+            }
           }
         ]
-      },
-      "Tags":[
-        {
-          "Key":"Name",
-          "Value":{
-            "Ref":"AWS::StackName"
-          }
-        }
-      ],
-      "UserData":{
-        "Fn::Base64":{
-          "Fn::Join":[
-            "",
-            [
-              "#!/bin/bash -xe\n",
-              "yum update -y aws-cfn-bootstrap\n",
-              "/opt/aws/bin/cfn-init -v ",
-              "         --stack ",
-              {
-                "Ref":"AWS::StackName"
-              },
-              "         --resource Server ",
-              "         --configsets install_all ",
-              "         --region ",
-              {
-                "Ref":"AWS::Region"
-              },
-              "\n",
-              "/opt/aws/bin/cfn-signal -e $? ",
-              "         --stack ",
-              {
-                "Ref":"AWS::StackName"
-              },
-              "         --resource Server ",
-              "         --region ",
-              {
-                "Ref":"AWS::Region"
-              },
-              "\n"
-            ]
-          ]
-        }
-      }
-    },
-    "CreationPolicy":{
-      "ResourceSignal":{
-        "Timeout":"PT15M"
       }
     }
   },
-  "InstanceSecurityGroup":{
-    "Type":"AWS::EC2::SecurityGroup",
-    "Properties":{
-      "GroupDescription":"Enable SSH access via port 22",
-      "SecurityGroupIngress":[
-        {
-          "IpProtocol":"tcp",
-          "FromPort":"80",
-          "ToPort":"80",
-          "CidrIp":"0.0.0.0/0"
-        },
-        {
-          "IpProtocol":"tcp",
-          "FromPort":"22",
-          "ToPort":"22",
-          "CidrIp":{
-            "Ref":"SSHLocation"
-          }
-        }
-      ]
+  "Outputs":{
+    "PublicIP":{
+      "Description":"Public IP address of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicIp"
+        ]
+      }
+    },
+    "WebsiteHome":{
+      "Description":"Website Home",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/"
+          ]
+        ]
+      }
+    },
+    "InstanceId":{
+      "Description":"InstanceId of the newly created EC2 instance",
+      "Value":{
+        "Ref":"Server"
+      }
+    },
+    "AZ":{
+      "Description":"Availability Zone of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "AvailabilityZone"
+        ]
+      }
+    },
+    "PublicDNS":{
+      "Description":"Public DNSName of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicDnsName"
+        ]
+      }
     }
   }
-},
-"Outputs":{
-  "PublicIP":{
-    "Description":"Public IP address of the newly created EC2 instance",
-    "Value":{
-      "Fn::GetAtt":[
-        "Server",
-        "PublicIp"
-      ]
-    }
-  },
-  "WebsiteHome":{
-    "Description":"Website Home",
-    "Value":{
-      "Fn::Join":[
-        "",
-        [
-          "http://",
-          {
-            "Fn::GetAtt":[
-              "Server",
-              "PublicIp"
-            ]
-          },
-          "/"
-        ]
-      ]
-    }
-  },
-  "InstanceId":{
-    "Description":"InstanceId of the newly created EC2 instance",
-    "Value":{
-      "Ref":"Server"
-    }
-  },
-  "AZ":{
-    "Description":"Availability Zone of the newly created EC2 instance",
-    "Value":{
-      "Fn::GetAtt":[
-        "Server",
-        "AvailabilityZone"
-      ]
-    }
-  },
-  "PublicDNS":{
-    "Description":"Public DNSName of the newly created EC2 instance",
-    "Value":{
-      "Fn::GetAtt":[
-        "Server",
-"PublicDnsName"
-]
-}
-}
-}
 }
