@@ -55,11 +55,11 @@
         "AWS::CloudFormation::Init":{
           "configSets":{
             "install_all":[
+              "buildVersion",
               "install_cfn",
               "install_chef",
               "install_chefdk",
-              "install_cookbook_infrastructure",
-              "buildVersion"
+              "install_cookbook_infrastructure"
             ]
           },
           "install_chef":{

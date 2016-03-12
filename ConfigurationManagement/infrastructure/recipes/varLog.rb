@@ -3,7 +3,7 @@ link '/var/www/html/log' do
   link_type :symbolic
 end
 
-link '/var/www/html/buildNumber.txt' do
-  to '/home/ec2-user/buildNumber.txt'
+link '/var/www/html/buildVersion.txt' do
+  to '/home/ec2-user/buildVersion.txt'
   link_type :symbolic
 end
