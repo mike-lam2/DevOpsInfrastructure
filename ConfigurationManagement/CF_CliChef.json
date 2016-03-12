@@ -135,16 +135,26 @@
                   "Fn::Join":[
                     "",
                     [
-                      "default['default']['StackName'] = '",
-                      {
-                        "Ref":"AWS::StackName"
-                      },
-                      "'\n",
                       "default['default']['BuildVersion'] = '",
                       {
                         "Ref":"BuildVersion"
                       },
                       "'\n",
+                      "default['default']['StackId'] = '",
+                      {
+                        "Ref":"AWS::StackId"
+                      },                       
+                      "'\n",
+                      "default['default']['StackName'] = '",
+                      {
+                        "Ref":"AWS::StackName"
+                      },                       
+                      "'\n", 
+                      "default['default']['Region'] = '",
+                      {
+                        "Ref":"AWS::Region"
+                      },                       
+                      "'\n", 
                       "\n"
                     ]
                   ]
@@ -179,68 +189,6 @@
             }
           },
           "install_cfn":{
-            "files":{
-              "/etc/cfn/cfn-hup.conf":{
-                "content":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "[main]\n",
-                      "stack=",
-                      {
-                        "Ref":"AWS::StackId"
-                      },
-                      "\n",
-                      "region=",
-                      {
-                        "Ref":"AWS::Region"
-                      },
-                      "\n",
-                      "interval=1\n"
-                    ]
-                  ]
-                },
-                "mode":"000400",
-                "owner":"root",
-                "group":"root"
-              },
-              "/etc/cfn/hooks.d/cfn-auto-reloader.conf":{
-                "content":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "[cfn-auto-reloader-hook]\n",
-                      "triggers=post.update\n",
-                      "path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
-                      "action=/opt/aws/bin/cfn-init -v ",
-                      "         --stack ",
-                      {
-                        "Ref":"AWS::StackName"
-                      },
-                      "         --resource Server ",
-                      "         --configsets install_all ",
-                      "         --region ",
-                      {
-                        "Ref":"AWS::Region"
-                      },
-                      "\n",
-                      "runas=root\n"
-                    ]
-                  ]
-                }
-              }
-            },
-            "commands":{
-              "010-set-cfn-log":{
-                "command":"sudo  ln -s /etc/cfn /var/www/html/cfn",
-                "ignoreErrors":"true"
-              },
-              "0015-chmod-html":{
-                "command":"sudo chmod -R a+r *",
-                "cwd":"/etc/cfn",
-                "ignoreErrors":"true"
-              }
-            },
             "services":{
               "sysvinit":{
                 "cfn-hup":{
