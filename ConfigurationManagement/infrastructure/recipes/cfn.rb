@@ -20,7 +20,7 @@ template '/etc/cfn/cfn-hup.conf' do
 end
 
 template '/etc/cfn/hooks.d/cfn-auto-reloader.conf' do
-  source 'cfn-auto.reloader.conf'
+  source 'cfn-auto-reloader.conf.erb'
   owner 'root'
   group 'root'
   mode '0444'
