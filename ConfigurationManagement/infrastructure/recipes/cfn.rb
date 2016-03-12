@@ -1,14 +1,14 @@
 directory '/etc/cfn' do
   owner 'root'
   group 'root'
-  mode '0444'
+  mode '0755'
   action :create
 end
 
 directory '/etc/cfn/hooks.d' do
   owner 'root'
   group 'root'
-  mode '0444'
+  mode '0755'
   action :create
 end
 
@@ -16,14 +16,14 @@ template '/etc/cfn/cfn-hup.conf' do
   source 'cfn-hup.conf.erb'
   owner 'root'
   group 'root'
-  mode '0400'
+  mode '0444'
 end
 
 template '/etc/cfn/hooks.d/cfn-auto-reloader.conf' do
   source 'cfn-auto-reloader.conf'
   owner 'root'
   group 'root'
-  mode '0400'
+  mode '0444'
 end
 
 link '/var/www/html/cfn' do
