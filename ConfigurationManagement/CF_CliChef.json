@@ -58,8 +58,7 @@
               "install_cfn",
               "install_chef",
               "install_chefdk",
-              "install_cookbook_infrastructure",
-              "build_Version"
+              "install_cookbook_infrastructure"
             ]
           },
           "install_chef":{
@@ -139,6 +138,11 @@
                       "default['default']['StackName'] = '",
                       {
                         "Ref":"AWS::StackName"
+                      },
+                      "'\n",
+                      "default['default']['BuildVersion'] = '",
+                      {
+                        "Ref":"BuildVersion"
                       },
                       "'\n",
                       "\n"
@@ -247,25 +251,6 @@
                     "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
                   ]
                 }
-              }
-            }
-          },
-          "build_Version":{
-            "commands":{
-              "010-buildVersion":{
-                "command":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "sudo echo \"",
-                      {
-                        "Ref":"BuildVersion"
-                      },
-                      "\" >> /var/log/buildVersion.txt"
-                    ]
-                  ]
-                },
-                "ignoreErrors":"true"
               }
             }
           }
