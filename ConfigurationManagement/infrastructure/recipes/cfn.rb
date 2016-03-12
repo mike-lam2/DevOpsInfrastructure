@@ -1,3 +1,17 @@
+directory '/etc/cfn' do
+  owner 'root'
+  group 'root'
+  mode '0444'
+  action :create
+end
+
+directory '/etc/cfn/hooks.d' do
+  owner 'root'
+  group 'root'
+  mode '0444'
+  action :create
+end
+
 template '/etc/cfn/cfn-hup.conf' do
   source 'cfn-hup.conf.erb'
   owner 'root'
