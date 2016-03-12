@@ -141,7 +141,7 @@
                 "ignoreErrors":"true"
               },
               "20_run_chef":{
-                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::xterm]'",
+                "command":"chef-client --local-mode --runlist 'recipe[infrastructure]'",
                 "cwd":"/var/chef/chef-repo/cookbooks",
                 "ignoreErrors":"true"
               }
