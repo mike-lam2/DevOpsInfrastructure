@@ -55,11 +55,11 @@
         "AWS::CloudFormation::Init":{
           "configSets":{
             "install_all":[
-              "buildVersion",
               "install_cfn",
               "install_chef",
               "install_chefdk",
-              "install_cookbook_infrastructure"
+              "install_cookbook_infrastructure",
+              "build_Version"
             ]
           },
           "install_chef":{
@@ -250,9 +250,9 @@
               }
             }
           },
-          "buildVersion":{
+          "build_Version":{
             "commands":{
-              "000-buildVersion":{
+              "010-buildVersion":{
                 "command":{
                   "Fn::Join":[
                     "",
@@ -261,11 +261,10 @@
                       {
                         "Ref":"BuildVersion"
                       },
-                      "\" >> buildVersion.txt"
+                      "\" >> /var/log/buildVersion.txt"
                     ]
                   ]
-                },
-                "cwd":"/home/ec2-user/",
+                }
                 "ignoreErrors":"true"
               }
             }
