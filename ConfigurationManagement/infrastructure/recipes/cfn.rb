@@ -31,26 +31,20 @@ link '/var/www/html/cfn' do
   link_type :symbolic
 end
 
+service 'cfn-hup' do
+  action [ :enable, :start ]
+end
+
 #=beging is same as /* in java
 =begin
-              "0015-chmod-html":{
-                "command":"sudo chmod -R a+r *",
-                "cwd":"/etc/cfn",
-                "ignoreErrors":"true"
-              }
-            },
-            "services":{
-              "sysvinit":{
-                "cfn-hup":{
-                  "enabled":"true",
-                  "ensureRunning":"true",
-                  "files":[
-                    "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
-                  ]
-                }
-              }
-            }
-          }
-        }
+NOT SURE HOW TO DO THE FILES SECTION BELOW IN CHEF,MAYBE NOT NEEDED
+"services":{
+  "sysvinit":{
+    "cfn-hup":{
+      "enabled":"true",
+      "ensureRunning":"true",
+      "files":[
+        "/etc/cfn/cfn-hup.conf",
+        "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+      ] ...
 =end

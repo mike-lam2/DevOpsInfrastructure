@@ -57,8 +57,7 @@
             "install_all":[
               "install_chef",
               "install_chefdk",
-              "install_cookbook_infrastructure",
-              "install_cfn"
+              "install_cookbook_infrastructure"
             ]
           },
           "install_chef":{
@@ -185,20 +184,6 @@
             "packages":{
               "rpm":{
                 "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
-              }
-            }
-          },
-          "install_cfn":{
-            "services":{
-              "sysvinit":{
-                "cfn-hup":{
-                  "enabled":"true",
-                  "ensureRunning":"true",
-                  "files":[
-                    "/etc/cfn/cfn-hup.conf",
-                    "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
-                  ]
-                }
               }
             }
           }

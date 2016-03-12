@@ -1,5 +1,5 @@
 [cfn-auto-reloader-hook]
-triggers=post.update\n",
-path=Resources.Server.Metadata.AWS::CloudFormation::Init\n",
+triggers=post.update
+path=Resources.Server.Metadata.AWS::CloudFormation::Init
 action=/opt/aws/bin/cfn-init -v --stack <%=node.default['default']['StackName']%> --resource Server --configsets install_all --region <%=node.default['default']['Region']%> 
 runas=root
