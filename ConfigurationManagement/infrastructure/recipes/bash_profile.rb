@@ -13,7 +13,7 @@ fi
 # User specific environment and startup programs
 
 PATH=$PATH:$HOME/.local/bin:$HOME/bin:.
-PS1='.../${PWD##*/} \> '
+PS1=\'.../${PWD##*/} \> \'
 
 
 export PATH
