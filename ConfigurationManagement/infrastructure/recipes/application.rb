@@ -11,7 +11,9 @@ git '/var/www/html/'+application do
    group 'apache'
 end
 
-
+file '/var/www/html/*.sh' do
+  mode '0775'
+end
 
 =begin
 
@@ -21,24 +23,14 @@ end
                 "cwd":"/var/www",
                 "ignoreErrors":"true"
               },
-              "0020-git-Application":{
-                "command":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "git clone https://github.com/mike-lam2/",
+
+ USE SYNCH INSTEAD OF CLONE???                     "git clone https://github.com/mike-lam2/",
                       {
                         "Ref":"Application"
                       },
                       " --branch ",
                       {
                         "Ref":"BranchToClone"
-                      }
-                    ]
-                  ]
-                },
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
               },
               "0030-chmod-build":{
                 "command":{
