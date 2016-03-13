@@ -3,9 +3,11 @@ application= node.default['default']['Application']
 branch_name = node.default['default']['BranchToClone']
 repo=gitsite+application+'.git'
 
+#diff between synvh clone ???
 git '/var/www/html/'+application do
    repository repo
-   revision branch_name
+   checkout_branch branch_name
+   enable_checkout false
    action :sync
    user 'apache'
    group 'apache'
@@ -24,47 +26,6 @@ end
                 "ignoreErrors":"true"
               },
 
- USE SYNCH INSTEAD OF CLONE???                     "git clone https://github.com/mike-lam2/",
-                      {
-                        "Ref":"Application"
-                      },
-                      " --branch ",
-                      {
-                        "Ref":"BranchToClone"
-              },
-              "0030-chmod-build":{
-                "command":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "sudo chmod a+x ",
-                      {
-                        "Ref":"Application"
-                      },
-                      "/build.sh"
-                    ]
-                  ]
-                },
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
-              },
-              "0040-build":{
-                "command":{
-                  "Fn::Join":[
-                    "",
-                    [
-                      "sudo chmod a+x ",
-                      {
-                        "Ref":"Application"
-                      },
-                      "/build.sh"
-                    ]
-                  ]
-                },
-                "cwd":"/var/www/html",
-                "ignoreErrors":"true"
-              },
-              
               "0050-chown-Application":{
                 "command":{
                   "Fn::Join":[
