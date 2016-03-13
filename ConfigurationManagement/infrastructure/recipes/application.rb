@@ -8,7 +8,7 @@ git '/var/www/html/'+application do
    repository repo
    revision branch_name
    checkout_branch branch_name
-   enable_checkout 'false'
+   enable_checkout false
    action :sync
    user 'apache'
    group 'apache'
