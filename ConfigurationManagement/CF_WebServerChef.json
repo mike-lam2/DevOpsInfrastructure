@@ -193,8 +193,7 @@
                       "default['default']['Region'] = '",
                       {
                         "Ref":"AWS::Region"
-                      },                       
-                      "'\n", 
+                      },                        
                       "'\n", 
                       "default['default']['Application'] = '",
                       {
