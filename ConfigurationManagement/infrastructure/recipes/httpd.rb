@@ -4,7 +4,7 @@ package 'php'
 directory '/var/www/html' do
   owner 'apache'
   group 'apache'
-  mode '0664'
+  mode '0775'
   action :create
 end
 
