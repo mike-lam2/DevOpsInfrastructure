@@ -1,0 +1,346 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"CF_Cli.json extends on CF_EC2Base.json",
+  "Parameters":{
+    "KeyName":{
+      "Description":"Name of an existing EC2 KeyPair to enable SSH access to the instance",
+      "Type":"AWS::EC2::KeyPair::KeyName",
+      "Default":"mikeaws1",
+      "ConstraintDescription":"must be the name of an existing EC2 KeyPair."
+    },
+    "BuildVersion":{
+      "Description":"this is the build version,can be used to update",
+      "Type":"String"
+    },
+    "InstanceType":{
+      "Description":"WebServer EC2 instance type",
+      "Type":"String",
+      "Default":"t2.micro",
+      "AllowedValues":[
+        "t1.micro",
+        "t2.micro"
+      ],
+      "ConstraintDescription":"must be a valid EC2 instance type."
+    },
+    "SSHLocation":{
+      "Description":"The IP address range that can be used to SSH to the EC2 instances",
+      "Type":"String",
+      "MinLength":"9",
+      "MaxLength":"18",
+      "Default":"0.0.0.0/0",
+      "AllowedPattern":"(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription":"must be a valid IP CIDR range of the form x.x.x.x/x."
+    }
+  },
+  "Mappings":{
+    "AWSInstanceType2Arch":{
+      "t1.micro":{
+        "Arch":"PV64"
+      },
+      "t2.micro":{
+        "Arch":"HVM64"
+      }
+    },
+    "AWSRegionArch2AMI":{
+      "us-east-1":{
+        "PV64":"ami-d4f7ddbe",
+        "HVM64":"ami-8fcee4e5"
+      }
+    }
+  },
+  "Resources":{
+    "Server":{
+      "Type":"AWS::EC2::Instance",
+      "Metadata":{
+        "AWS::CloudFormation::Init":{
+          "configSets":{
+            "install_all":[
+              "install_chef",
+              "install_chefdk",
+              "install_cookbook_infrastructure"
+            ]
+          },
+          "install_chef":{
+            "sources":{
+              "/var/chef/chef-repo":"http://github.com/opscode/chef-repo/tarball/master"
+            },
+            "files":{
+              "/tmp/install.sh":{
+                "source":"https://www.opscode.com/chef/install.sh",
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              },
+              "/var/chef/chef-repo/.chef/knife.rb":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "cookbook_path [ '/var/chef/chef-repo/cookbooks' ]\n",
+                      "node_path [ '/var/chef/chef-repo/nodes' ]\n"
+                    ]
+                  ]
+                },
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              },
+              "/var/chef/chef-repo/.chef/client.rb":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "cookbook_path [ '/var/chef/chef-repo/cookbooks' ]\n",
+                      "node_path [ '/var/chef/chef-repo/nodes' ]\n"
+                    ]
+                  ]
+                },
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              }
+            },
+            "commands":{
+              "01_make_chef_readable":{
+                "command":"chmod +rx /var/chef"
+              },
+              "02_install_chef":{
+                "command":"bash /tmp/install.sh",
+                "cwd":"/var/chef"
+              },
+              "03_create_node_list":{
+                "command":"chef-client -z -c /var/chef/chef-repo/.chef/client.rb",
+                "cwd":"/var/chef/chef-repo",
+                "env":{
+                  "HOME":"/var/chef"
+                }
+              }
+            }
+          },
+          "install_cookbook_infrastructure":{
+            "packages":{
+              "yum":{
+                "git":[
+                  
+                ]
+              }
+            },
+            "sources":{
+              "/home/ec2-user/DevOpsInfrastructure":"https://github.com/mike-lam2/DevOpsInfrastructure/tarball/master"
+            },
+            "files":{
+              "/var/chef/chef-repo/cookbooks/infrastructure/attributes/default.rb":{
+                "content":{
+                  "Fn::Join":[
+                    "",
+                    [
+                      "default['default']['BuildVersion'] = '",
+                      {
+                        "Ref":"BuildVersion"
+                      },
+                      "'\n",
+                      "default['default']['StackId'] = '",
+                      {
+                        "Ref":"AWS::StackId"
+                      },                       
+                      "'\n",
+                      "default['default']['StackName'] = '",
+                      {
+                        "Ref":"AWS::StackName"
+                      },                       
+                      "'\n", 
+                      "default['default']['Region'] = '",
+                      {
+                        "Ref":"AWS::Region"
+                      },                       
+                      "'\n", 
+                      "\n"
+                    ]
+                  ]
+                },
+                "mode":"000400",
+                "owner":"root",
+                "group":"root"
+              }
+            },
+            "commands":{
+              "05_generate_cookbook":{
+                "command":"chef generate cookbook infrastructure",
+                "cwd":"/var/chef/chef-repo/cookbooks",
+                "ignoreErrors":"true"
+              },
+              "10_cp_cookbook":{
+                "command":"cp -r /home/ec2-user/DevOpsInfrastructure/ConfigurationManagement/infrastructure /var/chef/chef-repo/cookbooks/",
+                "ignoreErrors":"true"
+              },
+              "20_run_chef":{
+                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::Skeleton]'",
+                "cwd":"/var/chef/chef-repo/cookbooks",
+                "ignoreErrors":"true"
+              }
+            }
+          },
+          "install_chefdk":{
+            "packages":{
+              "rpm":{
+                "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
+              }
+            }
+          }
+        }
+      },
+      "Properties":{
+        "InstanceType":{
+          "Ref":"InstanceType"
+        },
+        "SecurityGroups":[
+          {
+            "Ref":"InstanceSecurityGroup"
+          }
+        ],
+        "KeyName":{
+          "Ref":"KeyName"
+        },
+        "ImageId":{
+          "Fn::FindInMap":[
+            "AWSRegionArch2AMI",
+            {
+              "Ref":"AWS::Region"
+            },
+            {
+              "Fn::FindInMap":[
+                "AWSInstanceType2Arch",
+                {
+                  "Ref":"InstanceType"
+                },
+                "Arch"
+              ]
+            }
+          ]
+        },
+        "Tags":[
+          {
+            "Key":"Name",
+            "Value":{
+              "Ref":"AWS::StackName"
+            }
+          }
+        ],
+        "UserData":{
+          "Fn::Base64":{
+            "Fn::Join":[
+              "",
+              [
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                "         --stack ",
+                {
+                  "Ref":"AWS::StackName"
+                },
+                "         --resource Server ",
+                "         --configsets install_all ",
+                "         --region ",
+                {
+                  "Ref":"AWS::Region"
+                },
+                "\n",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                "         --stack ",
+                {
+                  "Ref":"AWS::StackName"
+                },
+                "         --resource Server ",
+                "         --region ",
+                {
+                  "Ref":"AWS::Region"
+                },
+                "\n"
+              ]
+            ]
+          }
+        }
+      },
+      "CreationPolicy":{
+        "ResourceSignal":{
+          "Timeout":"PT15M"
+        }
+      }
+    },
+    "InstanceSecurityGroup":{
+      "Type":"AWS::EC2::SecurityGroup",
+      "Properties":{
+        "GroupDescription":"Enable SSH access via port 22",
+        "SecurityGroupIngress":[
+          {
+            "IpProtocol":"tcp",
+            "FromPort":"80",
+            "ToPort":"80",
+            "CidrIp":"0.0.0.0/0"
+          },
+          {
+            "IpProtocol":"tcp",
+            "FromPort":"22",
+            "ToPort":"22",
+            "CidrIp":{
+              "Ref":"SSHLocation"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs":{
+    "PublicIP":{
+      "Description":"Public IP address of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicIp"
+        ]
+      }
+    },
+    "WebsiteHome":{
+      "Description":"Website Home",
+      "Value":{
+        "Fn::Join":[
+          "",
+          [
+            "http://",
+            {
+              "Fn::GetAtt":[
+                "Server",
+                "PublicIp"
+              ]
+            },
+            "/"
+          ]
+        ]
+      }
+    },
+    "InstanceId":{
+      "Description":"InstanceId of the newly created EC2 instance",
+      "Value":{
+        "Ref":"Server"
+      }
+    },
+    "AZ":{
+      "Description":"Availability Zone of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "AvailabilityZone"
+        ]
+      }
+    },
+    "PublicDNS":{
+      "Description":"Public DNSName of the newly created EC2 instance",
+      "Value":{
+        "Fn::GetAtt":[
+          "Server",
+          "PublicDnsName"
+        ]
+      }
+    }
+  }
+}
