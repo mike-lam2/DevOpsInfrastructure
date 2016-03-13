@@ -3,6 +3,7 @@ application= node.default['default']['Application']
 branch_name = node.default['default']['BranchToClone']
 repo=gitsite+application+'.git'
 
+=begin
 #diff between synvh clone ???
 git '/var/www/html/'+application do
    repository repo
@@ -13,12 +14,35 @@ git '/var/www/html/'+application do
    user 'apache'
    group 'apache'
 end
+=end
+
+bash 'git-clone' do
+  cwd '/var/www/html/'
+  code <<-EOH
+    mkdir  #{application}
+    cd #{application}
+    git clone https://github.com/mike-lam2/#{application} --branch #{branch_name} 
+    EOH
+end
 
 file '/var/www/html/'+application+'/build.sh' do
   mode '0775'
 end
 
 =begin
+
+
+ "git clone https://github.com/mike-lam2/",
+                      {
+                        "Ref":"Application"
+                      },
+                      " --branch ",
+                      {
+                        "Ref":"BranchToClone"
+                      }
+                    ]
+                  ]
+
 
             "commands":{
               "0015-chmod-html":{
