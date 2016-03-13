@@ -1,7 +1,7 @@
 gitsite = node.default['default']['Gitsite']
 application= node.default['default']['Appplication']
 branch_name = node.default['default']['BranchToClone']
-repo=gitsite+appplication+".git"
+repo=gitsite+appplication+'.git'
 
 git '/var/www/html/'+application do
    repository repo
