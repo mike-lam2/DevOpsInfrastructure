@@ -1,5 +1,5 @@
 gitsite = node.default['default']['Gitsite']
-application= node.default['default']['Appplication']
+application= node.default['default']['Application']
 branch_name = node.default['default']['BranchToClone']
 repo=gitsite+application+'.git'
 
