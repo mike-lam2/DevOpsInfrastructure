@@ -21,8 +21,6 @@ bash 'git-clone' do
   user 'apache'
   group 'apache'
   code <<-EOH
-    mkdir  #{application}
-    cd #{application}
     git clone https://github.com/mike-lam2/#{application} --branch #{branch_name} 
     EOH
 end
