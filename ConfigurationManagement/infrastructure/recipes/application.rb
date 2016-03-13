@@ -18,6 +18,8 @@ end
 
 bash 'git-clone' do
   cwd '/var/www/html/'
+  user 'apache'
+  group 'apache'
   code <<-EOH
     mkdir  #{application}
     cd #{application}
