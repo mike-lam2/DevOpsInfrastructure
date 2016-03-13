@@ -11,7 +11,7 @@ git '/var/www/html/'+application do
    group 'apache'
 end
 
-file '/var/www/html/build.sh' do
+file '/var/www/html/'+application+'/build.sh' do
   mode '0775'
 end
 
