@@ -6,6 +6,7 @@ repo=gitsite+application+'.git'
 #diff between synvh clone ???
 git '/var/www/html/'+application do
    repository repo
+   revision branch_name
    checkout_branch branch_name
    enable_checkout 'false'
    action :sync

@@ -174,7 +174,7 @@
                 "ignoreErrors":"true"
               },
               "20_run_chef":{
-                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::Skeleton]'",
+                "command":"chef-client --local-mode --runlist 'recipe[infrastructure::skeleton]'",
                 "cwd":"/var/chef/chef-repo/cookbooks",
                 "ignoreErrors":"true"
               }
