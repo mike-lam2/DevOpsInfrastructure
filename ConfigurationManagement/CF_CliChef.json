@@ -58,6 +58,15 @@
               "install_chef",
               "install_chefdk",
               "install_cookbook_infrastructure"
+            ],
+            "install_chefclient12":[
+              "install_chef",
+              "install_chefdk",
+              "install_cookbook_infrastructure",
+              "install_chefclient12"
+            ],
+            "install_nothing":[
+              "install_rien"
             ]
           },
           "install_chef":{
@@ -142,18 +151,18 @@
                       "default['default']['StackId'] = '",
                       {
                         "Ref":"AWS::StackId"
-                      },                       
+                      },
                       "'\n",
                       "default['default']['StackName'] = '",
                       {
                         "Ref":"AWS::StackName"
-                      },                       
-                      "'\n", 
+                      },
+                      "'\n",
                       "default['default']['Region'] = '",
                       {
                         "Ref":"AWS::Region"
-                      },                       
-                      "'\n", 
+                      },
+                      "'\n",
                       "\n"
                     ]
                   ]
@@ -184,6 +193,17 @@
             "packages":{
               "rpm":{
                 "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
+              }
+            }
+          },
+          "install_rien":{
+            
+          },
+          "install_chefclient12":{
+            "commands":{
+              "10_chefclient12":{
+                "command":"curl -L https://www.getchef.com/chef/install.sh | sudo bash -s — -v 12.0.0",
+                "ignoreErrors":"true"
               }
             }
           }
@@ -231,27 +251,27 @@
             "Fn::Join":[
               "",
               [
-                "#!/bin/bash -xe\n",
-                "yum update -y aws-cfn-bootstrap\n",
-                "/opt/aws/bin/cfn-init -v ",
-                "         --stack ",
+                "#!/bin/bash-xe\n",
+                "yumupdate-yaws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init-v",
+                "--stack",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "         --resource Server ",
-                "         --configsets install_all ",
-                "         --region ",
+                "--resource Server",
+                "--configsets install_chefclient12",
+                "--region",
                 {
                   "Ref":"AWS::Region"
                 },
                 "\n",
-                "/opt/aws/bin/cfn-signal -e $? ",
-                "         --stack ",
+                "/opt/aws/bin/cfn-signal-e$?",
+                "--stack",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "         --resource Server ",
-                "         --region ",
+                "--resource Server",
+                "--region",
                 {
                   "Ref":"AWS::Region"
                 },
@@ -270,7 +290,7 @@
     "InstanceSecurityGroup":{
       "Type":"AWS::EC2::SecurityGroup",
       "Properties":{
-        "GroupDescription":"Enable SSH access via port 22",
+        "GroupDescription":"EnableSSHaccessviaport22",
         "SecurityGroupIngress":[
           {
             "IpProtocol":"tcp",
@@ -292,7 +312,7 @@
   },
   "Outputs":{
     "PublicIP":{
-      "Description":"Public IP address of the newly created EC2 instance",
+      "Description":"PublicIPaddressofthenewlycreatedEC2instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
@@ -301,7 +321,7 @@
       }
     },
     "WebsiteHome":{
-      "Description":"Website Home",
+      "Description":"WebsiteHome",
       "Value":{
         "Fn::Join":[
           "",
@@ -319,13 +339,13 @@
       }
     },
     "InstanceId":{
-      "Description":"InstanceId of the newly created EC2 instance",
+      "Description":"InstanceIdofthenewlycreatedEC2instance",
       "Value":{
         "Ref":"Server"
       }
     },
     "AZ":{
-      "Description":"Availability Zone of the newly created EC2 instance",
+      "Description":"AvailabilityZoneofthenewlycreatedEC2instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
@@ -334,7 +354,7 @@
       }
     },
     "PublicDNS":{
-      "Description":"Public DNSName of the newly created EC2 instance",
+      "Description":"PublicDNSNameofthenewlycreatedEC2instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
