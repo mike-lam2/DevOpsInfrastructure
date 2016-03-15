@@ -57,13 +57,13 @@
             "install_all":[
               "install_chef",
               "install_chefdk",
+              "upgrade_chefclient12",
               "install_cookbook_infrastructure"
             ],
             "install_chefclient12":[
               "install_chef",
               "install_chefdk",
-              "install_cookbook_infrastructure",
-              "install_chefclient12"
+              "upgrade_chefclient12"
             ],
             "install_nothing":[
               "install_rien"
@@ -199,7 +199,7 @@
           "install_rien":{
             
           },
-          "install_chefclient12":{
+          "upgrade_chefclient12":{
             "commands":{
               "10_chefclient12":{
                 "command":"curl -L https://www.getchef.com/chef/install.sh | sudo bash -s — -v 12.0.0",
@@ -251,27 +251,27 @@
             "Fn::Join":[
               "",
               [
-                "#!/bin/bash-xe\n",
-                "yumupdate-yaws-cfn-bootstrap\n",
-                "/opt/aws/bin/cfn-init-v",
-                "--stack",
+                "#!/bin/bash -xe\n",
+                "yum update -y aws-cfn-bootstrap\n",
+                "/opt/aws/bin/cfn-init -v ",
+                " --stack ",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "--resource Server",
-                "--configsets install_chefclient12",
-                "--region",
+                " --resource Server",
+                " --configsets install_all",
+                " --region ",
                 {
                   "Ref":"AWS::Region"
                 },
                 "\n",
-                "/opt/aws/bin/cfn-signal-e$?",
-                "--stack",
+                "/opt/aws/bin/cfn-signal -e $? ",
+                " --stack ",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "--resource Server",
-                "--region",
+                " --resource Server ",
+                " --region ",
                 {
                   "Ref":"AWS::Region"
                 },
@@ -290,7 +290,7 @@
     "InstanceSecurityGroup":{
       "Type":"AWS::EC2::SecurityGroup",
       "Properties":{
-        "GroupDescription":"EnableSSHaccessviaport22",
+        "GroupDescription":"Enable SSH access via port 22",
         "SecurityGroupIngress":[
           {
             "IpProtocol":"tcp",
@@ -312,7 +312,7 @@
   },
   "Outputs":{
     "PublicIP":{
-      "Description":"PublicIPaddressofthenewlycreatedEC2instance",
+      "Description":"Public IP address of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
@@ -321,7 +321,7 @@
       }
     },
     "WebsiteHome":{
-      "Description":"WebsiteHome",
+      "Description":"Website Home",
       "Value":{
         "Fn::Join":[
           "",
@@ -339,13 +339,13 @@
       }
     },
     "InstanceId":{
-      "Description":"InstanceIdofthenewlycreatedEC2instance",
+      "Description":"InstanceId of the newly created EC2 instance",
       "Value":{
         "Ref":"Server"
       }
     },
     "AZ":{
-      "Description":"AvailabilityZoneofthenewlycreatedEC2instance",
+      "Description":"Availability Zone of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
@@ -354,7 +354,7 @@
       }
     },
     "PublicDNS":{
-      "Description":"PublicDNSNameofthenewlycreatedEC2instance",
+      "Description":"PublicDNS Name of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",

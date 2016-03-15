@@ -98,7 +98,16 @@
             "install_all":[
               "install_chef",
               "install_chefdk",
+              "upgrade_chef12",
               "install_cookbook_infrastructure"
+            ],
+            "install_chefclient12":[
+              "install_chef",
+              "install_chefdk",
+              "upgrade_chef12"
+            ],
+            "install_nothing":[
+              "install_rien"
             ]
           },
           "install_chef":{
@@ -239,6 +248,17 @@
                 "chefdk":"https://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chefdk-0.2.0-2.el6.x86_64.rpm"
               }
             }
+          },
+          "install_rien":{
+            
+          },
+          "install_chefclient12":{
+            "commands":{
+              "10_chefclient12":{
+                "command":"curl -L https://www.getchef.com/chef/install.sh | sudo bash -s — -v 12.0.0",
+                "ignoreErrors":"true"
+              }
+            }
           }
         }
       },
@@ -287,24 +307,24 @@
                 "#!/bin/bash -xe\n",
                 "yum update -y aws-cfn-bootstrap\n",
                 "/opt/aws/bin/cfn-init -v ",
-                "         --stack ",
+                " --stack ",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "         --resource Server ",
-                "         --configsets install_all ",
-                "         --region ",
+                " --resource Server",
+                " --configsets install_all",
+                " --region ",
                 {
                   "Ref":"AWS::Region"
                 },
                 "\n",
                 "/opt/aws/bin/cfn-signal -e $? ",
-                "         --stack ",
+                " --stack ",
                 {
                   "Ref":"AWS::StackName"
                 },
-                "         --resource Server ",
-                "         --region ",
+                " --resource Server ",
+                " --region ",
                 {
                   "Ref":"AWS::Region"
                 },
@@ -421,7 +441,7 @@
       }
     },
     "PublicDNS":{
-      "Description":"Public DNSName of the newly created EC2 instance",
+      "Description":"PublicDNS Name of the newly created EC2 instance",
       "Value":{
         "Fn::GetAtt":[
           "Server",
